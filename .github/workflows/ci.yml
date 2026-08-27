@@ -1,0 +1,121 @@
+# 契约 SDK 的日常验证。发布不走这里(见 release.yml),但**发布会做的事这里基本都做一遍**。
+#
+# 与 release.yml 的差别只有三处:不推 nuget.org、不上传产物到 Release、
+# 以及 fork PR 拿不到强名称密钥时关掉签名继续跑。
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      # 复用仓库当前的默认版本:这条路径不推送,不需要编一个 CI 专属版本号。
+      - name: Resolve version
+        id: version
+        shell: pwsh
+        run: |
+          $props = Get-Content -Raw Directory.Build.props
+          $version = [regex]::Match($props, '<VelaSdkVersion[^>]*>([^<]+)</VelaSdkVersion>').Groups[1].Value
+          if ([string]::IsNullOrWhiteSpace($version)) {
+            Write-Error "Could not read VelaSdkVersion from Directory.Build.props"
+            exit 1
+          }
+          "version=$version" >> $env:GITHUB_OUTPUT
+          Write-Host "Validating version $version"
+
+      # 版本号同步体检 —— 「仓库里那几处版本号是否一致」的唯一守门人。
+      # release.yml 的 Stamp 步骤只改 runner 上的工作区,不回写仓库,所以漏改只能靠这里显形。
+      # 顺带核对「SDK 主版本 == VelaPluginApi.Level」这条纪律。
+      - name: Version consistency check
+        shell: pwsh
+        run: |
+          & ./scripts/Set-Version.ps1 '${{ steps.version.outputs.version }}' -Check
+          # if ($LASTEXITCODE) 而不是 -ne 0:.ps1 不调用 exit 时**不会设置** $LASTEXITCODE,
+          # 那时它是 $null —— 而 `$null -ne 0` 为真,会把一次成功判成失败。
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+      # 来自 fork 的 PR 拿不到仓库机密(GitHub 的既定行为),此时**关掉签名**继续跑 ——
+      # 不关的话 CSC 会因为找不到 .snk 直接失败,PR 作者只会看到一条与他改动无关的报错。
+      - name: Restore strong-name key
+        shell: pwsh
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:SNK_B64)) {
+            Write-Host "::notice::STRONG_NAME_KEY unavailable (fork PR); building without strong-name signing."
+            "VELA_SIGN_ARGS=-p:SignAssembly=false" >> $env:GITHUB_ENV
+          } else {
+            [IO.File]::WriteAllBytes("VelaShell.snk", [Convert]::FromBase64String($env:SNK_B64))
+          }
+        env:
+          SNK_B64: ${{ secrets.STRONG_NAME_KEY }}
+
+      # 必须是 Debug:Release 打开强名签名,而测试程序集不是签名友元。
+      - name: Test
+        shell: pwsh
+        run: |
+          dotnet test VelaShell.PluginSdk.slnx -c Debug --nologo
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: Pack
+        shell: pwsh
+        run: |
+          $version = '${{ steps.version.outputs.version }}'
+          New-Item -ItemType Directory -Force artifacts/nuget | Out-Null
+          $projects = @(
+            'src/VelaShell.PluginSdk/VelaShell.PluginSdk.csproj',
+            'src/VelaShell.PluginSdk.Testing/VelaShell.PluginSdk.Testing.csproj'
+          )
+          foreach ($project in $projects) {
+            dotnet pack $project -c Release -o artifacts/nuget -p:VelaSdkVersion=$version --nologo $env:VELA_SIGN_ARGS
+            if ($LASTEXITCODE -ne 0) { exit 1 }
+          }
+          Get-ChildItem artifacts/nuget | Select-Object -ExpandProperty Name
+
+      # ── 拆库之后新增的一步 ────────────────────────────────────────────────
+      # 本仓库是 Avalonia 版本锁的**权威**,而这个事实只通过包里那一个 buildTransitive
+      # props 文件传达给下游(宿主的 VerifyAvaloniaMatchesSdk、cli 仓库的
+      # VerifyAvaloniaVersionPin 都读它)。单仓库时代那两处核对是直接读文件的,
+      # 漏打进包也没人发现;现在包就是唯一通道,所以拆完包核对一遍它真的在里面。
+      - name: Verify the pin props shipped in the package
+        shell: pwsh
+        run: |
+          $version = '${{ steps.version.outputs.version }}'
+          $nupkg = "artifacts/nuget/VelaShell.PluginSdk.$version.nupkg"
+          if (-not (Test-Path $nupkg)) { throw "Package not found: $nupkg" }
+          $work = Join-Path $env:RUNNER_TEMP 'pinprops'
+          Remove-Item -Recurse -Force $work -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force $work | Out-Null
+          # Expand-Archive 只认 .zip 扩展名,.nupkg 直接喂给它会被拒;先复制一份改名。
+          $zip = Join-Path $work 'pkg.zip'
+          Copy-Item $nupkg $zip
+          Expand-Archive -Path $zip -DestinationPath (Join-Path $work 'x')
+          $props = Join-Path $work 'x/buildTransitive/VelaShell.PluginSdk.props'
+          if (-not (Test-Path $props)) {
+            throw "buildTransitive/VelaShell.PluginSdk.props is missing from the package. Downstream repos read the pinned Avalonia version from it; without it the host and VelaShell.PluginSdk.Build lose their only cross-repo consistency check."
+          }
+          $text = Get-Content -Raw $props
+          $expected = [regex]::Match((Get-Content -Raw Directory.Build.props), '<VelaAvaloniaVersion>([^<]+)</VelaAvaloniaVersion>').Groups[1].Value
+          $shipped = [regex]::Match($text, '<VelaSdkPinnedAvaloniaVersion>([^<]+)</VelaSdkPinnedAvaloniaVersion>').Groups[1].Value
+          if ($shipped -ne $expected) {
+            throw "Package ships VelaSdkPinnedAvaloniaVersion '$shipped' but Directory.Build.props says '$expected'."
+          }
+          Write-Host "Pinned Avalonia = $shipped, SDK package version = $version"
+          Write-Host $text
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: nuget-packages
+          path: artifacts/nuget/*
+          if-no-files-found: error

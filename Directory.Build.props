@@ -1,0 +1,105 @@
+<Project>
+  <PropertyGroup>
+	<TargetFramework>net11.0</TargetFramework>
+  </PropertyGroup>
+
+  <!-- 定义 Linux -->
+  <PropertyGroup>
+  	<IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsLinux)' == 'true'">
+  	<DefineConstants>$(DefineConstants);LINUX</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--
+      本仓库产出两个包,共用这个版本号:
+          VelaShell.PluginSdk           契约程序集
+          VelaShell.PluginSdk.Testing   测试替身
+
+      **与其余工具链解耦**(2026-08-27 拆库起):vela-plugin 与 VelaShell.PluginSdk.Build 在
+      joesdu/velashell-plugin-cli,dotnet new 模板在 joesdu/velashell-plugin-templates,
+      三者各有各的版本号。SDK 发 1.6.0 不要求 CLI 跟着发;CLI 发 1.5.3 也不代表契约动了。
+      下游只在**想吃到新契约**的时候才把自己引用的 VelaShell.PluginSdk 版本抬上来。
+
+      与宿主版本同样无关:VelaShell 主程序发 1.2.3 不代表插件契约变了。
+      CI 发包时用 -p:VelaSdkVersion= 覆盖(取自 Release 标签)。
+    -->
+    <VelaSdkVersion Condition="'$(VelaSdkVersion)' == ''">1.5.0</VelaSdkVersion>
+    <!-- 去掉预发布后缀的数字版(AssemblyVersion/FileVersion 不接受后缀)与主版本号。 -->
+    <VelaSdkVersionCore>$([System.Text.RegularExpressions.Regex]::Replace($(VelaSdkVersion), '-.*$', ''))</VelaSdkVersionCore>
+    <VelaSdkMajor>$([System.Text.RegularExpressions.Regex]::Replace($(VelaSdkVersionCore), '\..*$', ''))</VelaSdkMajor>
+    <Version>$(VelaSdkVersion)</Version>
+    <AssemblyVersion>$(VelaSdkVersionCore)</AssemblyVersion>
+    <FileVersion>$(VelaSdkVersionCore)</FileVersion>
+    <!-- 不把 git 提交哈希拼进 InformationalVersion(默认会加 +sha 后缀)。 -->
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--
+      插件与宿主必须用同一版本的 Avalonia:装载器强制让 Avalonia* 回落到宿主那一套
+      (见宿主的 PluginAssemblyLoadContext),版本不一致时表现为跨 ALC 的控件类型对不上。
+
+      **本仓库是这两个版本号在整个插件生态里的唯一权威。** 它自己不引用 Avalonia,
+      但 VelaShell.PluginSdk 包会把它们写进 buildTransitive/VelaShell.PluginSdk.props,
+      导出成 $(VelaSdkPinnedAvaloniaVersion) / $(VelaSdkPinnedAvaloniaEditVersion),
+      由两个下游在**自己的构建期**核对:
+        · 宿主仓库 src/Directory.Build.targets 的 VerifyAvaloniaMatchesSdk;
+        · velashell-plugin-cli 的 VelaShell.PluginSdk.Build(它用精确区间 [x.y.z]
+          把这个版本锁给所有插件工程),见其 VerifyAvaloniaVersionPin。
+
+      改这里 = 改插件生态的 Avalonia 版本,必须与宿主同一波发布,并且让 cli 仓库
+      跟着抬一次 VelaSdkPackageVersion —— 否则它那道核对会红。
+    -->
+    <VelaAvaloniaVersion>12.1.1</VelaAvaloniaVersion>
+    <!-- AvaloniaEdit 走自己的版本线(程序集名 AvaloniaEdit 同样命中装载器的 "Avalonia" 前缀,
+         运行时一律回落到宿主那份),因此同样必须与宿主一致。 -->
+    <VelaAvaloniaEditVersion>12.0.0</VelaAvaloniaEditVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+  	<Authors>joesdu</Authors>
+  	<PackagePrefix>VelaShell</PackagePrefix>
+  	<RepositoryType>git</RepositoryType>
+  	<RepositoryUrl>https://github.com/joesdu/velashell-plugin-sdk</RepositoryUrl>
+  	<GenerateAssemblyConfigurationAttribute>True</GenerateAssemblyConfigurationAttribute>
+  	<GenerateAssemblyCompanyAttribute>True</GenerateAssemblyCompanyAttribute>
+  	<GenerateAssemblyProductAttribute>True</GenerateAssemblyProductAttribute>
+  	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+  	<PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net11.0'">
+  	<EnablePreviewFeatures>true</EnablePreviewFeatures>
+  	<Features>$(Features);runtime-async=on</Features>
+  	<NoWarn>$(NoWarn);CA2252;SYSLIB5007;</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+  	<None Include=".\README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <PropertyGroup>
+  	<LangVersion>preview</LangVersion>
+  	<Nullable>enable</Nullable>
+  	<ImplicitUsings>enable</ImplicitUsings>
+  	<NoWarn>$(NoWarn);IDE0047;</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <VelaRepoRoot>$(MSBuildThisFileDirectory)</VelaRepoRoot>
+    <VelaArtifactsDir Condition="'$(VelaArtifactsDir)' == ''">$(VelaRepoRoot)artifacts</VelaArtifactsDir>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- 强名称密钥。宿主(Release 下签名)引用 VelaShell.PluginSdk,已签名程序集不能引用
+         未签名程序集,因此 SDK 必须用**与宿主同一把**钥匙签名。密钥不入库
+         (.gitignore 里 *.snk),CI 从 STRONG_NAME_KEY 机密还原到这里;
+         本地日常构建走 Debug,不需要它。
+         注:vela-plugin 与 VelaShell.PluginSdk.Build 都不签名 —— 未签名程序集**可以**
+         引用已签名的,方向是对的,所以 cli 仓库不需要这把钥匙。 -->
+    <VelaStrongNameKey Condition="'$(VelaStrongNameKey)' == ''">$(MSBuildThisFileDirectory)VelaShell.snk</VelaStrongNameKey>
+  </PropertyGroup>
+</Project>

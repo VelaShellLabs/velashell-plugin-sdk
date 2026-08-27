@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="MSTest.TestAdapter" />
+    <PackageReference Include="MSTest.TestFramework" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 契约本身:.vpx 容器格式与 plugin.json 清单解析。这两块的实现在 SDK 里,
+         宿主装包与 vela-plugin 出包走的是同一份代码,所以格式的地面真值也归在这里。 -->
+    <ProjectReference Include="..\..\src\VelaShell.PluginSdk\VelaShell.PluginSdk.csproj" />
+  </ItemGroup>
+
+</Project>

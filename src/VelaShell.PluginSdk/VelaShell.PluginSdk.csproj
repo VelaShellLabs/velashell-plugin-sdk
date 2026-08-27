@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>VelaShell 插件开发 SDK:插件入口契约、能力接口(会话/远程文件/远程执行/命令/存储/日志/事件)与 plugin.json 清单模型。</Description>
+    <RootNamespace>VelaShell.PluginSdk</RootNamespace>
+    <!-- 隔离边界上的"细腰":本程序集是宿主与插件世界唯一共享的契约,
+         必须保持零重量级依赖(仅 BCL)。切勿引入 Avalonia / Tmds.Ssh / ReactiveUI。 -->
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);AddVelaSdkPinProps</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <!--
+    把本 SDK 锁定的 Avalonia 版本导出给下游工程(buildTransitive,因此宿主、
+    VelaShell.PluginSdk.Build 与插件工程都吃得到)。
+
+    为什么要有这么一条:插件工程编译期拿到的 Avalonia,与它在宿主进程里运行时被强制共享的
+    那份宿主 Avalonia,必须是同一个版本 —— 装载器让 Avalonia* 一律回落到装载方
+    (见宿主 PluginAssemblyLoadContext),版本漂了就是跨 ALC 的控件类型对不上,
+    而且要等到用户装上插件才炸。
+
+    单仓库时代这个核对是 VelaShell.PluginSdk.Build 直接 XmlPeek 宿主的
+    src/Directory.Packages.props 做的;拆库之后读不到对方的文件了,于是反过来:
+    **本仓库是权威**,把版本号写进包里,由每个下游在自己的构建期核对 ——
+      · 宿主仓库 src/Directory.Build.targets 的 VerifyAvaloniaMatchesSdk;
+      · velashell-plugin-cli 的 VelaShell.PluginSdk.Build,见其 VerifyAvaloniaVersionPin
+        (它引用本包,因此这两个属性会直接出现在它的构建里)。
+
+    VelaSdkPackageVersion 一并导出:下游想在诊断信息里报"编译时用的是哪版契约"时
+    不必再自己解析包版本。
+  -->
+  <Target Name="AddVelaSdkPinProps">
+    <PropertyGroup>
+      <_VelaSdkPinPropsFile>$(IntermediateOutputPath)VelaShell.PluginSdk.props</_VelaSdkPinPropsFile>
+    </PropertyGroup>
+    <ItemGroup>
+      <_VelaSdkPinPropsLine Include="&lt;Project&gt;" />
+      <_VelaSdkPinPropsLine Include="  &lt;PropertyGroup&gt;" />
+      <_VelaSdkPinPropsLine Include="    &lt;!-- 本 SDK 版本锁定的 Avalonia 版本。宿主必须引用同一版本,否则插件面板的控件类型跨 ALC 对不上。 --&gt;" />
+      <_VelaSdkPinPropsLine Include="    &lt;VelaSdkPinnedAvaloniaVersion&gt;$(VelaAvaloniaVersion)&lt;/VelaSdkPinnedAvaloniaVersion&gt;" />
+      <_VelaSdkPinPropsLine Include="    &lt;!-- AvaloniaEdit 的程序集名同样命中装载器的 &quot;Avalonia&quot; 前缀,因此同样必须与宿主一致。 --&gt;" />
+      <_VelaSdkPinPropsLine Include="    &lt;VelaSdkPinnedAvaloniaEditVersion&gt;$(VelaAvaloniaEditVersion)&lt;/VelaSdkPinnedAvaloniaEditVersion&gt;" />
+      <_VelaSdkPinPropsLine Include="    &lt;VelaSdkPackageVersion&gt;$(Version)&lt;/VelaSdkPackageVersion&gt;" />
+      <_VelaSdkPinPropsLine Include="  &lt;/PropertyGroup&gt;" />
+      <_VelaSdkPinPropsLine Include="&lt;/Project&gt;" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(_VelaSdkPinPropsFile)" Lines="@(_VelaSdkPinPropsLine)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(_VelaSdkPinPropsFile)" PackagePath="buildTransitive/VelaShell.PluginSdk.props" />
+    </ItemGroup>
+  </Target>
+
+</Project>
