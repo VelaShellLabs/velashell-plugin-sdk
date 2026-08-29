@@ -30,7 +30,7 @@
 - **引用**：无（仅 BCL）。
 - **被引用**：主仓库的 `VelaShell.Infrastructure`（能力实现与插件运行时）、`VelaShell.Presentation`（命令桥接）、`VelaShell.PluginHost`（隔离进程），以及全部插件项目。
 
-> 开发文档见 [开发指南](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs/dev-guide.md)；能力清单与权限模型见 [07-capability-apis.md](https://github.com/joesdu/VelaShell/blob/main/docs/plugins/07-capability-apis.md) 与 [06-permission-system.md](https://github.com/joesdu/VelaShell/blob/main/docs/plugins/06-permission-system.md)。测试替身见 [`VelaShell.PluginSdk.Testing`](../VelaShell.PluginSdk.Testing)。
+> 开发文档见 [开发指南](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs/dev-guide.md)；能力清单与权限模型见 [07-capability-apis.md](https://github.com/joesdu/VelaShell/blob/main/docs/plugins/07-capability-apis.md) 与 [06-permission-system.md](https://github.com/joesdu/VelaShell/blob/main/docs/plugins/06-permission-system.md)。测试替身见 [`VelaShell.PluginSdk.Testing`](../VelaShell.PluginSdk.Testing)。
 
 ## 发版
 

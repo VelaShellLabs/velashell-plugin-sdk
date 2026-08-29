@@ -1,7 +1,7 @@
 # Plugin SDK Reference
 
 > Applies to **SDK 1.5.0 / apiLevel 1**
-> See also (other repositories): [Development Guide](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs-en/dev-guide.md) (tutorial) · [CLI Manual](https://github.com/VelaShellLabs/velashell-plugin-cli/blob/main/docs-en/cli.md) · [Packaging and Publishing](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs-en/publishing.md)
+> See also (other repositories): [Development Guide](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs-en/dev-guide.md) (tutorial) · [CLI Manual](https://github.com/VelaShellLabs/velashell-plugin-cli/blob/main/docs-en/cli.md) · [Packaging and Publishing](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs-en/publishing.md)
 
 This page is the **lookup-oriented** view of the SDK: package layout, contract surface, what each
 capability can do and what constrains it, version history, and the test doubles. For a
