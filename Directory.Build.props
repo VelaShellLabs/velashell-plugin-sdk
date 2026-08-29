@@ -42,6 +42,12 @@
       插件与宿主必须用同一版本的 Avalonia:装载器强制让 Avalonia* 回落到宿主那一套
       (见宿主的 PluginAssemblyLoadContext),版本不一致时表现为跨 ALC 的控件类型对不上。
 
+      **这两个不是本仓库的 NuGet 依赖,因此 VS 的包管理器管不到、也不该把它们挪走。**
+      本仓库根本不引用 Avalonia(契约程序集是"细腰",只依赖 BCL)—— 这里写的是两个
+      **常量**,由下面 AddVelaSdkPinProps 原样写进包里发给下游。真正的 Avalonia
+      PackageReference 在 velashell-plugin-cli 的 VelaShell.PluginSdk.Build.csproj 上,
+      那一条才是用包管理器升的;升完它,这里也要跟着改,否则该仓库的 VELA1006 会红。
+
       **本仓库是这两个版本号在整个插件生态里的唯一权威。** 它自己不引用 Avalonia,
       但 VelaShell.PluginSdk 包会把它们写进 buildTransitive/VelaShell.PluginSdk.props,
       导出成 $(VelaSdkPinnedAvaloniaVersion) / $(VelaSdkPinnedAvaloniaEditVersion),
@@ -86,11 +92,6 @@
   	<Nullable>enable</Nullable>
   	<ImplicitUsings>enable</ImplicitUsings>
   	<NoWarn>$(NoWarn);IDE0047;</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <VelaRepoRoot>$(MSBuildThisFileDirectory)</VelaRepoRoot>
-    <VelaArtifactsDir Condition="'$(VelaArtifactsDir)' == ''">$(VelaRepoRoot)artifacts</VelaArtifactsDir>
   </PropertyGroup>
 
   <PropertyGroup>
