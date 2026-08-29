@@ -63,7 +63,7 @@
   	<Authors>joesdu</Authors>
   	<PackagePrefix>VelaShell</PackagePrefix>
   	<RepositoryType>git</RepositoryType>
-  	<RepositoryUrl>https://github.com/joesdu/velashell-plugin-sdk</RepositoryUrl>
+  	<RepositoryUrl>https://github.com/VelaShellLabs/velashell-plugin-sdk</RepositoryUrl>
   	<GenerateAssemblyConfigurationAttribute>True</GenerateAssemblyConfigurationAttribute>
   	<GenerateAssemblyCompanyAttribute>True</GenerateAssemblyCompanyAttribute>
   	<GenerateAssemblyProductAttribute>True</GenerateAssemblyProductAttribute>

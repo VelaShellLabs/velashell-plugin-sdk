@@ -65,7 +65,7 @@
 | --- | --- |
 | Policy name | `velashell-plugin-sdk`(随意,能认出来就行) |
 | Policy owner | `joes_du` |
-| Repository Owner | `joesdu` |
+| Repository Owner | `VelaShellLabs` |
 | **Repository** | `velashell-plugin-sdk` |
 | **Workflow File** | `release.yml` —— **只填文件名**,不要写 `.github/workflows/` 前缀 |
 | Environment | 留空(工作流没用 GitHub Environments) |

@@ -29,7 +29,7 @@
 #   NuGet/login 拿本次运行的 GitHub OIDC 令牌去 nuget.org 换一把**短时效**的推送密钥,
 #   用完即弃。密钥不落仓库机密,也就没有"泄漏了要轮换"这件事。
 #   ⚠️ 首次发版前必须在 nuget.org 上为**这两个包**各建一条可信发布策略,三项都填新值:
-#        Repository owner  joesdu
+#        Repository owner  VelaShellLabs
 #        Repository        velashell-plugin-sdk
 #        Workflow file     release.yml
 #      建法见 docs/release-process.md 的「NuGet 可信发布」一节。

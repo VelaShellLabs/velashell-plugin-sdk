@@ -23,7 +23,7 @@
 		<AssemblyVersion>$(VelaSdkMajor).0.0.0</AssemblyVersion>
 		<FileVersion>$(VelaSdkVersionCore)</FileVersion>
 		<PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/joesdu/velashell-plugin-sdk</PackageProjectUrl>
+		<PackageProjectUrl>https://github.com/VelaShellLabs/velashell-plugin-sdk</PackageProjectUrl>
 		<PackageTags>velashell;plugin;sdk;ssh;terminal</PackageTags>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
