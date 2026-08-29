@@ -1,11 +1,11 @@
 # Plugin SDK Reference
 
 > Applies to **SDK 1.5.0 / apiLevel 1**
-> See also (other repositories): [Development Guide](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs-en/dev-guide.md) (tutorial) · [CLI Manual](https://github.com/joesdu/velashell-plugin-cli/blob/main/docs-en/cli.md) · [Packaging and Publishing](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs-en/publishing.md)
+> See also (other repositories): [Development Guide](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs-en/dev-guide.md) (tutorial) · [CLI Manual](https://github.com/VelaShellLabs/velashell-plugin-cli/blob/main/docs-en/cli.md) · [Packaging and Publishing](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs-en/publishing.md)
 
 This page is the **lookup-oriented** view of the SDK: package layout, contract surface, what each
 capability can do and what constrains it, version history, and the test doubles. For a
-step-by-step walkthrough, read the [Development Guide](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs-en/dev-guide.md) first.
+step-by-step walkthrough, read the [Development Guide](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs-en/dev-guide.md) first.
 
 ---
 
@@ -13,14 +13,14 @@ step-by-step walkthrough, read the [Development Guide](https://github.com/joesdu
 
 | Package | Repository | Referenced by | Contents |
 | --- | --- | --- | --- |
-| **`VelaShell.PluginSdk.Build`** | [velashell-plugin-cli](https://github.com/joesdu/velashell-plugin-cli) | **the plugin project (this one only)** | MSBuild props/targets, a version-pinned Avalonia, the bundled packer, manifest validation, the `PackVpx` target |
+| **`VelaShell.PluginSdk.Build`** | [velashell-plugin-cli](https://github.com/VelaShellLabs/velashell-plugin-cli) | **the plugin project (this one only)** | MSBuild props/targets, a version-pinned Avalonia, the bundled packer, manifest validation, the `PackVpx` target |
 | `VelaShell.PluginSdk` | this repository | pulled in transitively | The contract assembly: entry interface, `IPluginContext` and every capability interface, DTOs, manifest model, `.vpx` container, host registry |
 | `VelaShell.PluginSdk.Testing` | this repository | the plugin's **test** project | `TestPluginContext` and in-memory doubles for every capability |
-| `VelaShell.Plugin.Cli` | [velashell-plugin-cli](https://github.com/joesdu/velashell-plugin-cli) | developer machine (dotnet tool) | `vela-plugin`: inner loop, validation, packing, signing, health check |
-| `VelaShell.Plugin.Templates` | [velashell-plugin-templates](https://github.com/joesdu/velashell-plugin-templates) | developer machine | `dotnet new velaplugin` / `velaplugin-ui` |
+| `VelaShell.Plugin.Cli` | [velashell-plugin-cli](https://github.com/VelaShellLabs/velashell-plugin-cli) | developer machine (dotnet tool) | `vela-plugin`: inner loop, validation, packing, signing, health check |
+| `VelaShell.Plugin.Templates` | [velashell-plugin-templates](https://github.com/VelaShellLabs/velashell-plugin-templates) | developer machine | `dotnet new velaplugin` / `velaplugin-ui` |
 
 The `PackageReference` line a plugin project needs — **including the current version** — lives in the
-[Development Guide](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs-en/dev-guide.md). That version belongs to
+[Development Guide](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs-en/dev-guide.md). That version belongs to
 `VelaShell.PluginSdk.Build`, which now versions independently of this SDK, so repeating it here
 would only guarantee it goes stale.
 

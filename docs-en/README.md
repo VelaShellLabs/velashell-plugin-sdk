@@ -16,7 +16,7 @@ packages they describe:
 | --- | --- |
 | **Development guide** (tutorial: writing your first plugin) | [velashell-plugin-templates / docs-en/dev-guide.md](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs-en/dev-guide.md) |
 | **Packaging and publishing** (`.vpx`, signing, the marketplace) | [velashell-plugin-templates / docs-en/publishing.md](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs-en/publishing.md) |
-| **`vela-plugin` manual** | [velashell-plugin-cli / docs-en/cli.md](https://github.com/joesdu/velashell-plugin-cli/blob/main/docs-en/cli.md) |
+| **`vela-plugin` manual** | [velashell-plugin-cli / docs-en/cli.md](https://github.com/VelaShellLabs/velashell-plugin-cli/blob/main/docs-en/cli.md) |
 
 Each of those carries the **version banner of its own package**, which is exactly why it has to
 live next to that package: keeping them here would mean every CLI release needs a commit in this
