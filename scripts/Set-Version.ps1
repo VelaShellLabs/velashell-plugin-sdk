@@ -10,17 +10,18 @@
       src/…/VelaPluginApi.cs           SdkVersion 常量           —— 宿主写进 host.json 的值,
                                                                     vela-plugin doctor 拿它跟
                                                                     插件的 minSdkVersion 比对
-      docs/sdk-reference.md            版本横幅
-      docs-en/sdk-reference.md         版本横幅
+      zh/sdk/sdk-reference.md          版本横幅       ┐ 这两处在 velashell-docs 仓库,
+      en/sdk/sdk-reference.md          version banner ┘ 是**可选**落点,见 -DocsRoot
 
     忘了改 VelaPluginApi.SdkVersion:**没有任何东西会报错** —— 只是 `vela-plugin doctor`
     从此汇报一个错的宿主 SDK 版本,插件的 minSdkVersion 门槛跟着判错。这一处最值得自动化。
-    docs 那两处不影响功能,但它们是给人照抄的。
+    docs 那两处不影响功能,但它们是给人照抄的 —— 2026-08-30 全部文档搬到
+    VelaShellLabs/velashell-docs 之后,它们不在本仓库的 checkout 里,所以找不到就跳过。
 
     **不在本仓库的落点**(2026-08-27 拆库起,各自由所在仓库的同名脚本管):
-      · dotnet new 模板的 sdkVersion 默认值 …… velashell-plugin-templates
-      · docs/dev-guide.md 的 PackageReference 片段 …… velashell-plugin-templates
-      · docs/cli.md 的版本横幅 …………………………… velashell-plugin-cli
+      · dotnet new 模板的 sdkVersion 默认值,以及 velashell-docs 里
+        zh|en/templates/dev-guide.md 的 PackageReference 片段 …… velashell-plugin-templates
+      · velashell-docs 里 zh|en/cli/cli.md 的版本横幅 ……… velashell-plugin-cli
     那几处跟的是 VelaShell.PluginSdk.Build / VelaShell.Plugin.Cli 的版本,与本仓库无关 ——
     这正是拆库要的效果:SDK 发 1.6.0 不必惊动模板和 CLI。
 
@@ -31,6 +32,11 @@
 
 .PARAMETER Version
     目标版本,SemVer(1.5.0 或 1.5.0-preview.1)。
+
+.PARAMETER DocsRoot
+    velashell-docs 仓库的位置,版本横幅写在那里。默认先看 $env:VELASHELL_DOCS,
+    再看与本仓库同级的 ../velashell-docs。找不到就跳过文档落点并提醒一句 —— 那是
+    另一个仓库,CI 的 checkout 里本来就没有它,不该因此让发版流水线变红。
 
 .PARAMETER Check
     只报告不落盘;有任何一处不同步就以退出码 1 结束。CI 用它做"仓库是否已同步"的体检。
@@ -44,6 +50,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory, Position = 0)] [string] $Version,
+    [string] $DocsRoot,
     [switch] $Check
 )
 
@@ -56,6 +63,17 @@ if ($Version -notmatch '^(\d+)\.(\d+)\.(\d+)(-[0-9A-Za-z.-]+)?$') {
 $major = [int]$Matches[1]
 
 $root = Split-Path -Parent $PSScriptRoot
+
+# ── velashell-docs 的位置 ────────────────────────────────────────────────────
+# 2026-08-30 起全部文档搬到 VelaShellLabs/velashell-docs,版本横幅跟着走了。那是另一个
+# 仓库,发版 runner 的 checkout 里没有它 —— 所以文档落点是**可选**的:本地开发时两个仓库
+# 通常并排放着,找得到就一起改;找不到就在末尾提醒一句,不让流水线因为缺个兄弟仓库而红。
+if (-not $DocsRoot) {
+    $DocsRoot = if ($env:VELASHELL_DOCS) { $env:VELASHELL_DOCS }
+                else { Join-Path (Split-Path -Parent $root) "velashell-docs" }
+}
+$docsAvailable = Test-Path (Join-Path $DocsRoot "zh")
+$skippedDocs = [System.Collections.Generic.List[string]]::new()
 
 # ── apiLevel 纪律的硬检查 ────────────────────────────────────────────────────
 # 纪律:SDK 主版本 == apiLevel。主版本变意味着契约破了,那一刻 VelaPluginApi.Level 必须
@@ -96,12 +114,14 @@ $edits.Add(@{
     What    = 'VelaPluginApi.SdkVersion'
 })
 $edits.Add(@{
-    Path    = 'docs/sdk-reference.md'
+    Repo    = "docs"
+    Path    = "zh/sdk/sdk-reference.md"
     Pattern = '(?<pre>适用版本:\*\*SDK )(?<val>\S+)(?<post> / apiLevel)'
     What    = '版本横幅'
 })
 $edits.Add(@{
-    Path    = 'docs-en/sdk-reference.md'
+    Repo    = "docs"
+    Path    = "en/sdk/sdk-reference.md"
     Pattern = '(?<pre>Applies to \*\*SDK )(?<val>\S+)(?<post> / apiLevel)'
     What    = 'version banner'
 })
@@ -109,7 +129,10 @@ $edits.Add(@{
 # ── 应用 ────────────────────────────────────────────────────────────────────
 $changed = [System.Collections.Generic.List[object]]::new()
 foreach ($edit in $edits) {
-    $path = Join-Path $root $edit.Path
+    $inDocs = $edit.ContainsKey("Repo") -and $edit.Repo -eq "docs"
+    if ($inDocs -and -not $docsAvailable) { $skippedDocs.Add($edit.Path); continue }
+
+    $path = if ($inDocs) { Join-Path $DocsRoot $edit.Path } else { Join-Path $root $edit.Path }
     if (-not (Test-Path $path)) { throw "落点文件不存在:$($edit.Path)" }
 
     $text = [IO.File]::ReadAllText($path)
@@ -124,7 +147,7 @@ foreach ($edit in $edits) {
     if ($stale.Count -eq 0) { continue }
 
     $changed.Add([pscustomobject]@{
-        File = $edit.Path
+        File = if ($inDocs) { "velashell-docs/" + $edit.Path } else { $edit.Path }
         What = $edit.What
         From = (($stale | ForEach-Object { $_.Groups['val'].Value } | Select-Object -Unique) -join ', ')
         To   = $Version
@@ -139,6 +162,15 @@ foreach ($edit in $edits) {
     $bytes = [IO.File]::ReadAllBytes($path)
     $hasBom = $bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF
     [IO.File]::WriteAllText($path, $updated, [Text.UTF8Encoding]::new($hasBom))
+}
+
+if ($skippedDocs.Count -gt 0) {
+    Write-Warning @"
+没找到 velashell-docs(试过 $DocsRoot),跳过了这几处文档里的版本横幅:
+$($skippedDocs -join [Environment]::NewLine)
+文档在 https://github.com/VelaShellLabs/velashell-docs —— 把它 clone 到本仓库同级目录,
+或用 -DocsRoot / `$env:VELASHELL_DOCS 指过去,再跑一次即可一并更新。
+"@
 }
 
 if ($changed.Count -eq 0) {

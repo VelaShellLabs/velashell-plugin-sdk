@@ -35,4 +35,4 @@ await ctx.RecordingCommands.RunAsync("my.plugin.refresh");
 
 真实用例见 [`tests/VelaShell.Plugin.Ai.Tests`](../../tests/VelaShell.Plugin.Ai.Tests) —— AI 插件的工具审批闸门、设置/机密存取与会话历史全部靠这套替身覆盖。
 
-> 用法详解见 [开发指南](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs/dev-guide.md)，测试策略见 [13-testing-strategy.md](https://github.com/joesdu/VelaShell/blob/main/docs/plugins/13-testing-strategy.md)。
+> 用法详解见 [开发指南](https://github.com/VelaShellLabs/velashell-docs/blob/main/zh/templates/dev-guide.md)，测试策略见 [13-testing-strategy.md](https://github.com/VelaShellLabs/velashell-docs/blob/main/zh/plugins/13-testing-strategy.md)。
