@@ -19,7 +19,7 @@
           VelaShell.PluginSdk.Testing   测试替身
 
       **与其余工具链解耦**(2026-08-27 拆库起):vela-plugin 与 VelaShell.PluginSdk.Build 在
-      joesdu/velashell-plugin-cli,dotnet new 模板在 joesdu/velashell-plugin-templates,
+      VelaShellLabs/velashell-plugin-cli,dotnet new 模板在 joesdu/velashell-plugin-templates,
       三者各有各的版本号。SDK 发 1.6.0 不要求 CLI 跟着发;CLI 发 1.5.3 也不代表契约动了。
       下游只在**想吃到新契约**的时候才把自己引用的 VelaShell.PluginSdk 版本抬上来。
 

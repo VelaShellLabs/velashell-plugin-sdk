@@ -13,9 +13,9 @@
 
 | 文档 | 去了哪 |
 | --- | --- |
-| **开发指南**(教程式,写第一个插件) | [velashell-plugin-templates / docs/dev-guide.md](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs/dev-guide.md) |
-| **打包与发布**(`.vpx`、签名、发到插件商店) | [velashell-plugin-templates / docs/publishing.md](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs/publishing.md) |
-| **`vela-plugin` 手册** | [velashell-plugin-cli / docs/cli.md](https://github.com/joesdu/velashell-plugin-cli/blob/main/docs/cli.md) |
+| **开发指南**(教程式,写第一个插件) | [velashell-plugin-templates / docs/dev-guide.md](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs/dev-guide.md) |
+| **打包与发布**(`.vpx`、签名、发到插件商店) | [velashell-plugin-templates / docs/publishing.md](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs/publishing.md) |
+| **`vela-plugin` 手册** | [velashell-plugin-cli / docs/cli.md](https://github.com/VelaShellLabs/velashell-plugin-cli/blob/main/docs/cli.md) |
 
 它们各自带着**自己那个包的版本号横幅**,所以必须跟包同仓库 —— 留在这里的话,
 CLI 发一版就要来改本仓库的文档,正是拆库要消掉的那种牵连。

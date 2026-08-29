@@ -1,10 +1,10 @@
 # 插件 SDK 参考
 
 > 适用版本:**SDK 1.5.0 / apiLevel 1**
-> 相关文档(在别的仓库):[开发指南](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs/dev-guide.md)(教程式) · [CLI 手册](https://github.com/joesdu/velashell-plugin-cli/blob/main/docs/cli.md) · [打包与发布](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs/publishing.md)
+> 相关文档(在别的仓库):[开发指南](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs/dev-guide.md)(教程式) · [CLI 手册](https://github.com/VelaShellLabs/velashell-plugin-cli/blob/main/docs/cli.md) · [打包与发布](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs/publishing.md)
 
 本篇是**面向查阅**的 SDK 全貌:包结构、契约表面、每个能力域能做什么/受什么限制、
-版本演进与测试替身。想要按步骤走一遍的,先读[开发指南](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs/dev-guide.md)。
+版本演进与测试替身。想要按步骤走一遍的,先读[开发指南](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs/dev-guide.md)。
 
 ---
 
@@ -12,13 +12,13 @@
 
 | 包 | 出自哪个仓库 | 谁引用 | 内容 |
 | --- | --- | --- | --- |
-| **`VelaShell.PluginSdk.Build`** | [velashell-plugin-cli](https://github.com/joesdu/velashell-plugin-cli) | **插件工程(只引这一个)** | MSBuild props/targets、锁定版本的 Avalonia、随包分发的打包器、清单校验、`PackVpx` 目标 |
+| **`VelaShell.PluginSdk.Build`** | [velashell-plugin-cli](https://github.com/VelaShellLabs/velashell-plugin-cli) | **插件工程(只引这一个)** | MSBuild props/targets、锁定版本的 Avalonia、随包分发的打包器、清单校验、`PackVpx` 目标 |
 | `VelaShell.PluginSdk` | 本仓库 | 由上者传递引入 | 契约程序集:入口接口、`IPluginContext` 与全部能力接口、DTO、清单模型、`.vpx` 容器、宿主注册表 |
 | `VelaShell.PluginSdk.Testing` | 本仓库 | 插件的**测试**工程 | `TestPluginContext` 与各能力的内存替身 |
-| `VelaShell.Plugin.Cli` | [velashell-plugin-cli](https://github.com/joesdu/velashell-plugin-cli) | 开发者机器(dotnet tool) | `vela-plugin`:开发内环、校验、打包、签名、体检 |
-| `VelaShell.Plugin.Templates` | [velashell-plugin-templates](https://github.com/joesdu/velashell-plugin-templates) | 开发者机器 | `dotnet new velaplugin` / `velaplugin-ui` |
+| `VelaShell.Plugin.Cli` | [velashell-plugin-cli](https://github.com/VelaShellLabs/velashell-plugin-cli) | 开发者机器(dotnet tool) | `vela-plugin`:开发内环、校验、打包、签名、体检 |
+| `VelaShell.Plugin.Templates` | [velashell-plugin-templates](https://github.com/VelaShellLabs/velashell-plugin-templates) | 开发者机器 | `dotnet new velaplugin` / `velaplugin-ui` |
 
-插件工程要写的那一行 `PackageReference`(**含当前版本号**)在[开发指南](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs/dev-guide.md)里 ——
+插件工程要写的那一行 `PackageReference`(**含当前版本号**)在[开发指南](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs/dev-guide.md)里 ——
 那个版本号属于 `VelaShell.PluginSdk.Build`,与本仓库的 SDK 版本各走各的线,
 所以不在这里重复一遍(重复一遍就是等着它过期)。
 

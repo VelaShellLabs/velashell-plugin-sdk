@@ -8,7 +8,7 @@
 | [`VelaShell.PluginSdk.Testing`](https://www.nuget.org/packages/VelaShell.PluginSdk.Testing) | 测试替身:`TestPluginContext` 与各能力的内存实现,不起宿主也能测插件 |
 
 > **插件作者一般不直接引用这两个包。** 写插件只需要引用 `VelaShell.PluginSdk.Build`,
-> 契约程序集会随它传递进来 —— 见[开发指南](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs/dev-guide.md)。
+> 契约程序集会随它传递进来 —— 见[开发指南](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs/dev-guide.md)。
 
 ## 插件生态的仓库分布
 
@@ -17,11 +17,11 @@
 | 仓库 | 产出 | 什么时候发 |
 | --- | --- | --- |
 | **本仓库** `velashell-plugin-sdk` | `VelaShell.PluginSdk`、`.Testing` | 契约有增删改时 |
-| [`velashell-plugin-cli`](https://github.com/joesdu/velashell-plugin-cli) | `VelaShell.Plugin.Cli`(`vela-plugin`)、`VelaShell.PluginSdk.Build` | 工具/打包/MSBuild 逻辑变化时 |
-| [`velashell-plugin-templates`](https://github.com/joesdu/velashell-plugin-templates) | `VelaShell.Plugin.Templates` | 模板内容变化,或要把新建工程指到新版 Build 包时 |
+| [`velashell-plugin-cli`](https://github.com/VelaShellLabs/velashell-plugin-cli) | `VelaShell.Plugin.Cli`(`vela-plugin`)、`VelaShell.PluginSdk.Build` | 工具/打包/MSBuild 逻辑变化时 |
+| [`velashell-plugin-templates`](https://github.com/VelaShellLabs/velashell-plugin-templates) | `VelaShell.Plugin.Templates` | 模板内容变化,或要把新建工程指到新版 Build 包时 |
 
 另外两个相关仓库:[joesdu/VelaShell](https://github.com/joesdu/VelaShell)(宿主主程序)、
-[joesdu/velashell-plugins](https://github.com/joesdu/velashell-plugins)(第一方插件)。
+[joesdu/velashell-plugins](https://github.com/VelaShellLabs/velashell-plugins)(第一方插件)。
 
 依赖方向是单向的,没有环:
 

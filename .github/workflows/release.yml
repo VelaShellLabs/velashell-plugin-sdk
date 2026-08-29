@@ -6,7 +6,7 @@
 #      VelaShell.PluginSdk.Testing   测试替身(TestPluginContext 与各能力内存实现)
 #
 # **其余三个包不在这里发**(2026-08-27 拆库起):
-#      VelaShell.Plugin.Cli / VelaShell.PluginSdk.Build … joesdu/velashell-plugin-cli
+#      VelaShell.Plugin.Cli / VelaShell.PluginSdk.Build … VelaShellLabs/velashell-plugin-cli
 #      VelaShell.Plugin.Templates ………………………………… joesdu/velashell-plugin-templates
 # 那两个仓库有自己的版本号与自己的 Release 流水线。本仓库发 1.6.0 **不要求**它们跟着发;
 # 它们只在想吃到新契约时才把自己引用的 VelaShell.PluginSdk 版本抬上来。

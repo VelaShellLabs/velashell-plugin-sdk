@@ -1,9 +1,9 @@
 # 发版流程(契约 SDK)
 
 > 本篇只讲**本仓库**怎么发版。`vela-plugin` / `VelaShell.PluginSdk.Build` 见
-> [velashell-plugin-cli](https://github.com/joesdu/velashell-plugin-cli/blob/main/docs/release-process.md),
+> [velashell-plugin-cli](https://github.com/VelaShellLabs/velashell-plugin-cli/blob/main/docs/release-process.md),
 > `dotnet new` 模板见
-> [velashell-plugin-templates](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs/release-process.md)。
+> [velashell-plugin-templates](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs/release-process.md)。
 
 本仓库一次发布产出两个包,共用 Release 标签里的版本号:
 
