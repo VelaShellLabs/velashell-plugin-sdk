@@ -8,7 +8,7 @@
 | [`VelaShell.PluginSdk.Testing`](https://www.nuget.org/packages/VelaShell.PluginSdk.Testing) | 测试替身:`TestPluginContext` 与各能力的内存实现,不起宿主也能测插件 |
 
 > **插件作者一般不直接引用这两个包。** 写插件只需要引用 `VelaShell.PluginSdk.Build`,
-> 契约程序集会随它传递进来 —— 见[开发指南](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs/dev-guide.md)。
+> 契约程序集会随它传递进来 —— 见[开发指南](https://github.com/VelaShellLabs/velashell-docs/blob/main/zh/templates/dev-guide.md)。
 
 ## 插件生态的仓库分布
 
@@ -20,8 +20,10 @@
 | [`velashell-plugin-cli`](https://github.com/VelaShellLabs/velashell-plugin-cli) | `VelaShell.Plugin.Cli`(`vela-plugin`)、`VelaShell.PluginSdk.Build` | 工具/打包/MSBuild 逻辑变化时 |
 | [`velashell-plugin-templates`](https://github.com/VelaShellLabs/velashell-plugin-templates) | `VelaShell.Plugin.Templates` | 模板内容变化,或要把新建工程指到新版 Build 包时 |
 
-另外两个相关仓库:[joesdu/VelaShell](https://github.com/joesdu/VelaShell)(宿主主程序)、
-[VelaShellLabs/velashell-plugins](https://github.com/VelaShellLabs/velashell-plugins)(第一方插件)。
+另外三个相关仓库:[joesdu/VelaShell](https://github.com/joesdu/VelaShell)(宿主主程序)、
+[VelaShellLabs/velashell-plugins](https://github.com/VelaShellLabs/velashell-plugins)(第一方插件)、
+[VelaShellLabs/velashell-docs](https://github.com/VelaShellLabs/velashell-docs)(**全部文档**,
+2026-08-30 起各仓库的 `docs/` 都搬到了那里)。
 
 依赖方向是单向的,没有环:
 
@@ -76,16 +78,24 @@ pwsh scripts/Set-Version.ps1 1.6.0     # 落版本号(4 处),连同功能改动�
 ```
 
 破坏性变更要先手工把 `VelaPluginApi.Level` +1 —— 脚本会核对但不代改,因为「契约破没破」
-是人的判断。完整流程见 [`docs/release-process.md`](docs/release-process.md)。
+是人的判断。完整流程见[发版流程](https://github.com/VelaShellLabs/velashell-docs/blob/main/zh/sdk/release-process.md)(在文档仓库)。
 
 ## 文档
 
-[`docs/`](docs/)(中文)· [`docs-en/`](docs-en/)(English)。本仓库只放契约相关的:
-[SDK 参考](docs/sdk-reference.md)与[发版流程](docs/release-process.md)。
-开发指南、CLI 手册、打包发布在另外两个仓库,链接见上表。
+文档不在本仓库 —— 2026-08-30 起全部集中到
+**[VelaShellLabs/velashell-docs](https://github.com/VelaShellLabs/velashell-docs)**。本仓库这份在
+[`zh/sdk/`](https://github.com/VelaShellLabs/velashell-docs/tree/main/zh/sdk)(中文)·
+[`en/sdk/`](https://github.com/VelaShellLabs/velashell-docs/tree/main/en/sdk)(English):
+[SDK 参考](https://github.com/VelaShellLabs/velashell-docs/blob/main/zh/sdk/sdk-reference.md)与[发版流程](https://github.com/VelaShellLabs/velashell-docs/blob/main/zh/sdk/release-process.md)。
 
-插件系统的**架构蓝图**(进程模型、IPC 协议、权限系统、威胁模型)留在主仓库的
-[`docs/plugins/`](https://github.com/joesdu/VelaShell/tree/main/docs/plugins)。
+隔壁还有:[开发指南](https://github.com/VelaShellLabs/velashell-docs/blob/main/zh/templates/dev-guide.md)、
+[CLI 手册](https://github.com/VelaShellLabs/velashell-docs/blob/main/zh/cli/cli.md)、
+[打包发布](https://github.com/VelaShellLabs/velashell-docs/blob/main/zh/templates/publishing.md),
+以及插件系统的**架构蓝图**(进程模型、IPC 协议、权限系统、威胁模型)
+[`zh/plugins/`](https://github.com/VelaShellLabs/velashell-docs/tree/main/zh/plugins)。
+
+> `scripts/Set-Version.ps1` 会顺带把 `zh|en/sdk/sdk-reference.md` 的版本横幅一起改掉,
+> 前提是 velashell-docs 就 clone 在本仓库同级目录(否则跳过并提醒,见其 `-DocsRoot`)。
 
 ## 许可
 
