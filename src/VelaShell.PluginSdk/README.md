@@ -30,7 +30,7 @@
 - **引用**：无（仅 BCL）。
 - **被引用**：主仓库的 `VelaShell.Infrastructure`（能力实现与插件运行时）、`VelaShell.Presentation`（命令桥接）、`VelaShell.PluginHost`（隔离进程），以及全部插件项目。
 
-> 开发文档见 [开发指南](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs/dev-guide.md)；能力清单与权限模型见 [07-capability-apis.md](https://github.com/joesdu/VelaShell/blob/main/docs/plugins/07-capability-apis.md) 与 [06-permission-system.md](https://github.com/joesdu/VelaShell/blob/main/docs/plugins/06-permission-system.md)。测试替身见 [`VelaShell.PluginSdk.Testing`](../VelaShell.PluginSdk.Testing)。
+> 开发文档见 [开发指南](https://github.com/VelaShellLabs/velashell-docs/blob/main/zh/templates/dev-guide.md)；能力清单与权限模型见 [07-capability-apis.md](https://github.com/VelaShellLabs/velashell-docs/blob/main/zh/plugins/07-capability-apis.md) 与 [06-permission-system.md](https://github.com/VelaShellLabs/velashell-docs/blob/main/zh/plugins/06-permission-system.md)。测试替身见 [`VelaShell.PluginSdk.Testing`](../VelaShell.PluginSdk.Testing)。
 
 ## 发版
 
@@ -48,4 +48,4 @@
 工作区、**不回写仓库**，忘了落版本号的话由 CI 的版本同步体检兜底。
 想先验一遍不推送，用 workflow_dispatch 勾 dryRun。
 
-完整流程与 nuget.org 可信发布的配置见 [docs/release-process.md](../../docs/release-process.md)。
+完整流程与 nuget.org 可信发布的配置见 [发版流程](https://github.com/VelaShellLabs/velashell-docs/blob/main/zh/sdk/release-process.md)。
