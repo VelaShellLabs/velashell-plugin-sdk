@@ -21,7 +21,7 @@
 | [`velashell-plugin-templates`](https://github.com/VelaShellLabs/velashell-plugin-templates) | `VelaShell.Plugin.Templates` | 模板内容变化,或要把新建工程指到新版 Build 包时 |
 
 另外两个相关仓库:[joesdu/VelaShell](https://github.com/joesdu/VelaShell)(宿主主程序)、
-[joesdu/velashell-plugins](https://github.com/VelaShellLabs/velashell-plugins)(第一方插件)。
+[VelaShellLabs/velashell-plugins](https://github.com/VelaShellLabs/velashell-plugins)(第一方插件)。
 
 依赖方向是单向的,没有环:
 

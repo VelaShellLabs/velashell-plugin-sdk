@@ -1,7 +1,7 @@
 # 插件 SDK 参考
 
 > 适用版本:**SDK 1.5.0 / apiLevel 1**
-> 相关文档(在别的仓库):[开发指南](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs/dev-guide.md)(教程式) · [CLI 手册](https://github.com/VelaShellLabs/velashell-plugin-cli/blob/main/docs/cli.md) · [打包与发布](https://github.com/joesdu/velashell-plugin-templates/blob/main/docs/publishing.md)
+> 相关文档(在别的仓库):[开发指南](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs/dev-guide.md)(教程式) · [CLI 手册](https://github.com/VelaShellLabs/velashell-plugin-cli/blob/main/docs/cli.md) · [打包与发布](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs/publishing.md)
 
 本篇是**面向查阅**的 SDK 全貌:包结构、契约表面、每个能力域能做什么/受什么限制、
 版本演进与测试替身。想要按步骤走一遍的,先读[开发指南](https://github.com/VelaShellLabs/velashell-plugin-templates/blob/main/docs/dev-guide.md)。
