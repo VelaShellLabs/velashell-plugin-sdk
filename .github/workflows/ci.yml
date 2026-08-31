@@ -39,13 +39,31 @@ jobs:
       # 版本号同步体检 —— 「仓库里那几处版本号是否一致」的唯一守门人。
       # release.yml 的 Stamp 步骤只改 runner 上的工作区,不回写仓库,所以漏改只能靠这里显形。
       # 顺带核对「SDK 主版本 == VelaPluginApi.Level」这条纪律。
+      # 【为什么 PR 上只提醒、不判红】发布产物**不依赖**仓库当时的版本状态:release.yml 会在
+      # runner 上按标签重跑 Set-Version.ps1(见那边的 Stamp 步骤),把全部落点改写一遍。
+      # 所以落点漂移伤的是**人**(文档里写着过期版本号、`vela-plugin doctor` 汇报一个错的
+      # 宿主 SDK 版本),不是发布正确性 —— 拿仓库卫生问题挡住别人的 PR 不成比例,
+      # 何况提 PR 的人多半不是造成漂移的那个。
+      #
+      # push 到 main/dev 仍然判红:那时仓库确实处在不诚实的状态,而且此刻有能力修它的人
+      # 就是刚把代码合进来的那个。
+      #
+      # 注意这一步还有**另一类**失败:apiLevel 纪律核对(SDK 主版本 == VelaPluginApi.Level)
+      # 是 `throw` 而不是 exit code,它会直接终止本步,不走下面这段降级 —— 这是**对的**:
+      # 那不是版本号漂移,是"契约破没破"这个判断本身没落到代码里,PR 上就该拦住。
       - name: Version consistency check
         shell: pwsh
         run: |
           & ./scripts/Set-Version.ps1 '${{ steps.version.outputs.version }}' -Check
           # if ($LASTEXITCODE) 而不是 -ne 0:.ps1 不调用 exit 时**不会设置** $LASTEXITCODE,
           # 那时它是 $null —— 而 `$null -ne 0` 为真,会把一次成功判成失败。
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          if ($LASTEXITCODE) {
+            if ('${{ github.event_name }}' -eq 'pull_request') {
+              Write-Host "::warning title=版本号落点不同步::跑 ``pwsh scripts/Set-Version.ps1 <版本>`` 修正。PR 上只提醒,合进 main/dev 后会判红。"
+              exit 0
+            }
+            exit $LASTEXITCODE
+          }
 
       # 来自 fork 的 PR 拿不到仓库机密(GitHub 的既定行为),此时**关掉签名**继续跑 ——
       # 不关的话 CSC 会因为找不到 .snk 直接失败,PR 作者只会看到一条与他改动无关的报错。
