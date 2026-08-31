@@ -1,5 +1,6 @@
 using VelaShell.PluginSdk.Logging;
 using VelaShell.PluginSdk.Sessions;
+using VelaShell.PluginSdk.Theming;
 
 namespace VelaShell.PluginSdk.Rpc;
 
@@ -189,9 +190,18 @@ public static class PluginRpc
     public const string UiPanelClosed = "ui/closed";
 
     /// <summary>
-    /// 主题令牌快照通知(握手后与每次主题切换时下发):PluginHost 把宿主的
+    /// 主题状态通知(握手后与每次**生效配色变化**时下发):PluginHost 把宿主的
     /// <c>Vela*</c> 资源令牌注入本进程 Application 资源,插件的
-    /// <c>{DynamicResource VelaXxx}</c> 在隔离模式下同样生效。
+    /// <c>{DynamicResource VelaXxx}</c> 在隔离模式下同样生效;同一条消息里带上
+    /// <see cref="HostThemeInfo" />,驱动 <see cref="Theming.IHostThemeApi" />。
+    /// <para>
+    /// 令牌与身份必须走**同一条**消息:插件在 <c>Changed</c> 里读 <c>Colors</c>,
+    /// 拆成两条就会出现“身份已经是新主题、颜色还是旧主题”的中间态。
+    /// </para>
+    /// <para>
+    /// “生效配色变化”是三件事的并集:换具名主题、“跟随系统”下系统明暗翻转、用户改强调色。
+    /// 后两者不经过 <see cref="HostEvent" /> 的 <c>themeChanged</c>,只由本通知承载。
+    /// </para>
     /// </summary>
     public const string ThemeTokens = "theme/tokens";
 }
@@ -207,10 +217,15 @@ public sealed record HandshakeRequest(string Token, string PluginId, string Plug
 /// <param name="ApiLevel">协商结果(交集内取最高)。</param>
 /// <param name="HostVersion">宿主版本。</param>
 /// <param name="Locale">当前语言。</param>
-/// <param name="Theme">当前主题。</param>
+/// <param name="Theme">当前主题的明暗名(<c>dark</c>/<c>light</c>/<c>system</c>),见 <see cref="IHostInfo.Theme" />。</param>
 /// <param name="SupportsEmbedding">宿主是否支持停靠嵌入(HWND 收养,仅 Windows)。</param>
+/// <param name="ThemeInfo">
+/// 已解析的主题身份(id / 显示名 / 明暗 / 强调色)。<see cref="Theming.IHostThemeApi.Current" />
+/// 的初值 —— 握手就要给,否则插件在 <c>Activate</c> 里建界面时还不知道自己长在哪套主题上。
+/// 老宿主不带此字段时为 <see langword="null" />,PluginHost 退回按 <paramref name="Theme" /> 猜。
+/// </param>
 public sealed record HandshakeResponse(int ApiLevel, string HostVersion, string Locale, string Theme,
-    bool SupportsEmbedding = false);
+    bool SupportsEmbedding = false, HostThemeInfo? ThemeInfo = null);
 
 /// <summary>会话查询参数。</summary>
 public sealed record SessionRef(string SessionId);
@@ -301,8 +316,13 @@ public sealed record ActivateRequest(string Reason);
 /// </summary>
 public sealed record ThemeTokenDto(string Key, string Kind, string Value);
 
-/// <summary>主题令牌快照通知载荷。</summary>
-public sealed record ThemeTokensNotification(ThemeTokenDto[] Tokens);
+/// <summary>主题状态通知载荷:整套已解析令牌 + 主题身份。</summary>
+/// <param name="Tokens">全部 <c>Vela*</c> 令牌的已解析值。宿主没有 UI 层令牌提供者时为空数组。</param>
+/// <param name="Theme">
+/// 已解析的主题身份。老宿主不带此字段时为 <see langword="null" />,
+/// 此时 PluginHost 保留上一次的身份、只更新颜色。
+/// </param>
+public sealed record ThemeTokensNotification(ThemeTokenDto[] Tokens, HostThemeInfo? Theme = null);
 
 /// <summary>KV 键载荷。</summary>
 public sealed record StorageKeyRef(string Key);

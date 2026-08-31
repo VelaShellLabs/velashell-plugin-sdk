@@ -26,7 +26,7 @@
       与宿主版本同样无关:VelaShell 主程序发 1.2.3 不代表插件契约变了。
       CI 发包时用 -p:VelaSdkVersion= 覆盖(取自 Release 标签)。
     -->
-    <VelaSdkVersion Condition="'$(VelaSdkVersion)' == ''">1.5.0</VelaSdkVersion>
+    <VelaSdkVersion Condition="'$(VelaSdkVersion)' == ''">1.6.0</VelaSdkVersion>
     <!-- 去掉预发布后缀的数字版(AssemblyVersion/FileVersion 不接受后缀)与主版本号。 -->
     <VelaSdkVersionCore>$([System.Text.RegularExpressions.Regex]::Replace($(VelaSdkVersion), '-.*$', ''))</VelaSdkVersionCore>
     <VelaSdkMajor>$([System.Text.RegularExpressions.Regex]::Replace($(VelaSdkVersionCore), '\..*$', ''))</VelaSdkMajor>
