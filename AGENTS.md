@@ -61,6 +61,26 @@ Release 下 `dotnet test` 编不过。签名密钥不入库,CI 从 `STRONG_NAME_
    由本包经 `buildTransitive` 导出成 `$(VelaSdkPinnedAvaloniaVersion)`,宿主与 CLI 仓库在
    各自构建期核对。改它 = 改整个插件生态的 Avalonia 版本,必须与宿主同一波发布。
 
+### 版本号不归你定 —— 也不要为了自证能编译去造本地包
+
+**发版是人的决定,不是实现细节。** 给 SDK 加了新契约面之后:
+
+- **不要**跑 `scripts/Set-Version.ps1`、不要动 `Directory.Build.props` 的 `VelaSdkVersion`、
+  不要动 `VelaPluginApi.SdkVersion`。下一版是 1.6.0 还是 1.5.2、还是先发个 preview,
+  取决于当时排了什么、要不要跟宿主同波发 —— 这些你不知道。
+- **不要** `dotnet pack` 出本地包、不要在任何 `nuget.config` 里加本地源、
+  不要把下游仓库的 `Directory.Packages.props` 指到一个还不存在的版本。
+  自己造一个包来让编译通过,等于把「这套东西还没发布」这个事实从构建结果里抹掉;
+  而且本地包必然**未签名**(`VelaShell.snk` 不在仓库里),下游一编译就是一片
+  `CS0012` 强名称不匹配 —— 那是自己制造的噪声,不是真问题。
+- 文档、XML 注释、版本历史表里需要写版本号的地方,一律写 `TBD` 并在同一句里说明
+  「发版时替换」。`grep -rn TBD` 要能一次找全。
+- 交付时**明确说一句**:契约已就位,需要发一版 SDK;下游仓库(宿主、插件)在包发布前
+  编译不过是预期内的,发布后把各自的 `Directory.Packages.props` 抬上去即可。
+
+下游同理:宿主与插件仓库的 `Directory.Packages.props` / `plugin.json` 里的
+`minSdkVersion`,在包真的发布之前都不要改。
+
 ### 发版脚本会写 velashell-docs
 
 `scripts/Set-Version.ps1` 的版本横幅落点有两处在**另一个仓库**:

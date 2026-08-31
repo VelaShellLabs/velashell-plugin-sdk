@@ -9,7 +9,7 @@ namespace VelaShell.PluginSdk;
 public static class VelaPluginApi
 {
     /// <summary>当前 SDK 的 apiLevel 代际。</summary>
-    public const int Level = 1;
+    public const int Level = 2;
 
     /// <summary>
     /// 当前 SDK 的语义版本(<c>主.次.修订</c>)。
@@ -56,15 +56,16 @@ public static class VelaPluginApi
     /// <c>minSdkVersion: "1.4.0"</c>(声明了反而会把插件挡在老宿主之外,而它在老宿主上跑得好好的)。
     /// </para>
     /// <para>
-    /// <b>1.6</b> 加了 <see cref="Theming.IHostThemeApi" />(<c>IPluginContext.Theme</c>):
+    /// <b>TBD(尚未发版,发版时把本段的 TBD 换成实际版本号)</b> 加了
+    /// <see cref="Theming.IHostThemeApi" />(<c>IPluginContext.Theme</c>):
     /// 主题身份 + 整套已解析的 <c>Vela*</c> 配色 + 覆盖全部换肤情形的变更信号。
     /// 在这之前插件能看到的主题信息只有 <see cref="IHostInfo.Theme" /> 那三个值
     /// (<c>dark</c>/<c>light</c>/<c>system</c>)—— 宿主后来长出十来套具名主题,
     /// 它们全被收敛成自己的明暗名,于是插件既认不出是哪一套、也认不出强调色,
     /// 而且在 VelaDark 与 Tokyo Night 之间换肤时那个值**根本不变**:
     /// 任何按它判断“要不要重取颜色”的代码都会整整漏掉一次换肤。
-    /// 同样只增不改,apiLevel 仍是 1,靠 <c>minSdkVersion: "1.6.0"</c> 在发现期拦住老宿主。
+    /// 同样只增不改,apiLevel 仍是 1,靠 <c>minSdkVersion</c> 在发现期拦住老宿主。
     /// </para>
     /// </summary>
-    public const string SdkVersion = "1.6.0";
+    public const string SdkVersion = "1.5.0";
 }
