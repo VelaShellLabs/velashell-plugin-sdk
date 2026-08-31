@@ -8,7 +8,17 @@ namespace VelaShell.PluginSdk;
 /// </summary>
 public static class VelaPluginApi
 {
-    /// <summary>当前 SDK 的 apiLevel 代际。</summary>
+    /// <summary>
+    /// 当前 SDK 的 apiLevel 代际。
+    /// <para>
+    /// 纪律是「SDK 主版本 == apiLevel」,由 <c>scripts/Set-Version.ps1</c> 在发版前硬核对。
+    /// 代际是插件与宿主之间的**装载闸**:宿主拒载 <c>apiLevel</c> 高于自身的插件,
+    /// 在**发现期**给出可读原因,而不是等装载时抛一个看不懂的程序集绑定异常。
+    /// </para>
+    /// <para>
+    /// <b>2</b>(SDK 2.0):见 <see cref="SdkVersion" /> 的 2.0 一段。
+    /// </para>
+    /// </summary>
     public const int Level = 2;
 
     /// <summary>
@@ -56,16 +66,35 @@ public static class VelaPluginApi
     /// <c>minSdkVersion: "1.4.0"</c>(声明了反而会把插件挡在老宿主之外,而它在老宿主上跑得好好的)。
     /// </para>
     /// <para>
-    /// <b>TBD(尚未发版,发版时把本段的 TBD 换成实际版本号)</b> 加了
-    /// <see cref="Theming.IHostThemeApi" />(<c>IPluginContext.Theme</c>):
+    /// <b>2.0</b> —— 本系列**第一次**动 <see cref="Level" />(1 → 2)。
+    /// 上面 1.1 ~ 1.5 那几档都是"只增不改",这一档不是:主版本跳变把
+    /// <c>AssemblyVersion</c> 从 <c>1.0.0.0</c> 带到 <c>2.0.0.0</c>
+    /// (见 <c>src/Directory.Build.props</c> 的 <c>$(VelaSdkMajor).0.0.0</c>),
+    /// 于是**已编译的插件必须重新编译**才能被装载 —— 这就是代际的含义,
+    /// 也正是 <c>apiLevel</c> 存在的理由:老宿主在发现期按代际干净拒载,
+    /// 而不是等到装载时抛一个"找不到 VelaShell.PluginSdk 2.0.0.0"的绑定异常。
+    /// </para>
+    /// <para>
+    /// 插件作者要做的两件事:① 用 2.x 的 SDK 重新编译;
+    /// ② 把 <c>plugin.json</c> 的 <c>apiLevel</c> 改成 <c>2</c> —— 不改也能在 2.x 宿主上跑
+    /// (宿主接受不高于自身的代际),但**装到 1.x 宿主上时**你要的是发现期那句
+    /// "需要更新 VelaShell",而不是一个程序集绑定异常。
+    /// </para>
+    /// <para>
+    /// 内容上这一档带的是 <see cref="Theming.IHostThemeApi" />(<c>IPluginContext.Theme</c>):
     /// 主题身份 + 整套已解析的 <c>Vela*</c> 配色 + 覆盖全部换肤情形的变更信号。
     /// 在这之前插件能看到的主题信息只有 <see cref="IHostInfo.Theme" /> 那三个值
     /// (<c>dark</c>/<c>light</c>/<c>system</c>)—— 宿主后来长出十来套具名主题,
     /// 它们全被收敛成自己的明暗名,于是插件既认不出是哪一套、也认不出强调色,
     /// 而且在 VelaDark 与 Tokyo Night 之间换肤时那个值**根本不变**:
-    /// 任何按它判断“要不要重取颜色”的代码都会整整漏掉一次换肤。
-    /// 同样只增不改,apiLevel 仍是 1,靠 <c>minSdkVersion</c> 在发现期拦住老宿主。
+    /// 任何按它判断"要不要重取颜色"的代码都会整整漏掉一次换肤。
+    /// </para>
+    /// <para>
+    /// 顺带一处源码级不兼容:<see cref="IPluginContext" /> 多了 <c>Theme</c> 成员。
+    /// 插件是**消费**这个接口的,不受影响;自己写了 <c>IPluginContext</c> 实现的
+    /// (多半是测试替身)要补上这个成员 —— 或者改用
+    /// <c>VelaShell.PluginSdk.Testing</c> 的 <c>TestPluginContext</c>,它已经带好了。
     /// </para>
     /// </summary>
-    public const string SdkVersion = "1.5.0";
+    public const string SdkVersion = "2.0.0";
 }

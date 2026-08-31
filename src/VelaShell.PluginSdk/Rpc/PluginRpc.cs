@@ -5,7 +5,7 @@ using VelaShell.PluginSdk.Theming;
 namespace VelaShell.PluginSdk.Rpc;
 
 /// <summary>
-/// 隔离进程模式的方法名与线协 DTO(apiLevel 1)。
+/// 隔离进程模式的方法名与线协 DTO(apiLevel 2)。
 /// 方向:插件 → 宿主为能力调用;宿主 → 插件为生命周期与事件推送。
 /// 纪律与 SDK 相同:同 apiLevel 只增不改;DTO 全部为不可变记录。
 /// </summary>
