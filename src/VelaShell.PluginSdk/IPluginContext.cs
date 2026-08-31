@@ -76,6 +76,17 @@ public interface IPluginContext
     /// <summary>宿主事件:会话连接/断开、主题与语言切换。</summary>
     IHostEvents Events { get; }
 
+    /// <summary>
+    /// 主题能力:当前主题的身份(id / 显示名 / 明暗 / 强调色)、整套已解析的 <c>Vela*</c> 配色,
+    /// 以及覆盖全部换肤情形的变更信号。
+    /// <para>
+    /// Avalonia 界面取色请直接用 <c>{DynamicResource VelaXxx}</c>(自动跟随,两种宿主模式一致);
+    /// 本能力是给拿不到 DynamicResource 的地方用的 —— 需要 <c>Color</c> 而非 <c>Brush</c>、
+    /// 代码里一次性取值需要重取信号、或要按主题身份分支。见 <see cref="Theming.IHostThemeApi" />。
+    /// </para>
+    /// </summary>
+    Theming.IHostThemeApi Theme { get; }
+
     /// <summary>界面能力:呈现插件自建的 Avalonia 面板(停靠标签页或独立窗口)。</summary>
     IUiApi Ui { get; }
 

@@ -76,6 +76,9 @@ public sealed class TestPluginContext : IPluginContext, IDisposable
     /// <summary>默认事件替身。</summary>
     public TestHostEvents HostEvents { get; } = new();
 
+    /// <summary>默认主题替身。</summary>
+    public TestHostTheme HostTheme { get; } = new();
+
     /// <summary>默认界面替身。</summary>
     public FakeUi FakeUi { get; } = new();
 
@@ -161,6 +164,9 @@ public sealed class TestPluginContext : IPluginContext, IDisposable
     /// <inheritdoc cref="IPluginContext.Events" />
     public IHostEvents Events { get; init; }
 
+    /// <inheritdoc cref="IPluginContext.Theme" />
+    public Theming.IHostThemeApi Theme { get; init; }
+
     /// <inheritdoc cref="IPluginContext.Ui" />
     public IUiApi Ui { get; init; }
 
@@ -195,6 +201,7 @@ public sealed class TestPluginContext : IPluginContext, IDisposable
         TerminalView = FakeTerminalView;
         Commands = RecordingCommands;
         Events = HostEvents;
+        Theme = HostTheme;
         Ui = FakeUi;
         Secrets = FakeSecrets;
         Clipboard = FakeClipboard;
