@@ -22,6 +22,9 @@
     <!-- 契约本身:.vpx 容器格式与 plugin.json 清单解析。这两块的实现在 SDK 里,
          宿主装包与 vela-plugin 出包走的是同一份代码,所以格式的地面真值也归在这里。 -->
     <ProjectReference Include="..\..\src\VelaShell.PluginSdk\VelaShell.PluginSdk.csproj" />
+    <!-- 测试替身也是发出去的产物:插件作者照着它写单测,它的行为语义(比如"只能关自己
+         打开的那些会话")就是契约的一部分,所以在这里也守一道。 -->
+    <ProjectReference Include="..\..\src\VelaShell.PluginSdk.Testing\VelaShell.PluginSdk.Testing.csproj" />
   </ItemGroup>
 
 </Project>

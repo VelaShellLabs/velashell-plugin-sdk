@@ -95,6 +95,31 @@ public static class VelaPluginApi
     /// (多半是测试替身)要补上这个成员 —— 或者改用
     /// <c>VelaShell.PluginSdk.Testing</c> 的 <c>TestPluginContext</c>,它已经带好了。
     /// </para>
+    /// <para>
+    /// <b>TBD</b>(发版时替换为实际版本号)给会话能力加了三个方法:
+    /// <see cref="Sessions.ISessionsApi.ListSavedAsync" />(已保存的连接配置,含此刻没连着的)、
+    /// <see cref="Sessions.ISessionsApi.OpenAsync" />(请求宿主打开其中一条)与
+    /// <see cref="Sessions.ISessionsApi.CloseAsync" />(只能关自己打开的那些)。
+    /// 在这之前插件只能操作用户<b>已经手动连上</b>的机器,于是所有"无人值守"的用法都塌了半边:
+    /// IM 桥接里同事在群里问一句"生产机磁盘满了吗",而值班的人昨晚关掉了那个标签页,
+    /// 机器人只能回"你先去连一台";外部 agent 经 MCP 调进来时更是如此 —— 它根本不在这台机器前面。
+    /// </para>
+    /// <para>
+    /// 权限扩张的闸门写在契约里,而不是留给实现去自觉:插件<b>只能打开已保存的配置</b>
+    /// (连哪些机器由用户先在宿主里定下来)、凭据一个字节都不经过插件、宿主可以拒绝且
+    /// 拒绝是契约的一部分(<see cref="PluginPermissionDeniedException" />)。
+    /// <see cref="Sessions.SessionOpenOptions.Reason" /> 是给那个确认框用的,会原样显示给用户。
+    /// 连不上单独给了 <see cref="PluginSessionOpenException" /> —— "不让你连"与"没连上"
+    /// 对插件而言处置完全不同,塞进同一个类型里就只能靠读消息文本去猜。
+    /// </para>
+    /// <para>
+    /// 仍是只增不改,<see cref="Level" /> 不动;用到这一档的插件靠
+    /// <c>minSdkVersion: "TBD"</c> 在发现期拦住老宿主。
+    /// 自己写了 <c>ISessionsApi</c> 实现的(多半是测试替身)要补上这三个成员 ——
+    /// <c>VelaShell.PluginSdk.Testing</c> 的 <c>FakeSessions</c> 已经带好了,
+    /// 还附带 <c>DenyOpen</c> / <c>OpenFailure</c> / <c>LastOpenReason</c> 三个钩子,
+    /// 把"用户点了不"与"连不上"这两条路也能测到。
+    /// </para>
     /// </summary>
     public const string SdkVersion = "2.0.0";
 }

@@ -25,6 +25,19 @@ public static class PluginRpc
     /// <summary>会话单查。</summary>
     public const string SessionsGet = "sessions/get";
 
+    /// <summary>会话:已保存的连接配置列表(含此刻没连着的)。</summary>
+    public const string SessionsListSaved = "sessions/listSaved";
+
+    /// <summary>
+    /// 会话:请求宿主打开一条已保存的会话。
+    /// <b>这一条可以很慢</b> —— 中间夹着一个给用户看的确认框,还有真正的建连;
+    /// 调用方的超时要按"人要看一眼再点"来给,而不是按普通能力调用。
+    /// </summary>
+    public const string SessionsOpen = "sessions/open";
+
+    /// <summary>会话:关掉本插件打开的会话(参数是 <see cref="SessionRef" />)。</summary>
+    public const string SessionsClose = "sessions/close";
+
     /// <summary>远程执行。</summary>
     public const string ExecRun = "exec/run";
 
@@ -229,6 +242,12 @@ public sealed record HandshakeResponse(int ApiLevel, string HostVersion, string 
 
 /// <summary>会话查询参数。</summary>
 public sealed record SessionRef(string SessionId);
+
+/// <summary>打开一条已保存会话的参数。</summary>
+/// <param name="SavedSessionId"><see cref="Sessions.SavedSessionInfo.SavedSessionId" />,不是会话 id。</param>
+/// <param name="Reason">给用户看的理由,见 <see cref="Sessions.SessionOpenOptions.Reason" />。</param>
+/// <param name="ReuseConnected">已有连着的同配置会话时直接复用。</param>
+public sealed record SessionOpenRequest(string SavedSessionId, string Reason, bool ReuseConnected);
 
 /// <summary>远程执行参数。</summary>
 public sealed record ExecRunRequest(string SessionId, string Command, double TimeoutSeconds);

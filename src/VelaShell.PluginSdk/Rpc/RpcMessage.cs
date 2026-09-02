@@ -57,6 +57,9 @@ public static class RpcErrorCodes
     /// <summary>用户拒绝了敏感能力请求。</summary>
     public const string PermissionDenied = "permission-denied";
 
+    /// <summary>已保存的会话打不开(网络、认证、指纹等)。</summary>
+    public const string SessionOpenFailed = "session-open-failed";
+
     /// <summary>未分类错误。</summary>
     public const string Unknown = "error";
 
@@ -65,6 +68,8 @@ public static class RpcErrorCodes
     {
         PluginPermissionDeniedException => PermissionDenied,
         PluginSessionNotFoundException => SessionNotFound,
+        // 必须排在 InvalidOperationException 之前:它是后者的子类,顺序反了就永远命中不到
+        PluginSessionOpenException => SessionOpenFailed,
         TimeoutException => Timeout,
         OperationCanceledException => Timeout,
         ArgumentException => BadArguments,
@@ -77,6 +82,7 @@ public static class RpcErrorCodes
     {
         PermissionDenied => new PluginPermissionDeniedException(message),
         SessionNotFound => new PluginSessionNotFoundException("", message),
+        SessionOpenFailed => new PluginSessionOpenException("", message),
         Timeout => new TimeoutException(message),
         BadArguments => new ArgumentException(message),
         InvalidOperation => new InvalidOperationException(message),
