@@ -26,7 +26,7 @@
       与宿主版本同样无关:VelaShell 主程序发 1.2.3 不代表插件契约变了。
       CI 发包时用 -p:VelaSdkVersion= 覆盖(取自 Release 标签)。
     -->
-    <VelaSdkVersion Condition="'$(VelaSdkVersion)' == ''">2.0.0</VelaSdkVersion>
+    <VelaSdkVersion Condition="'$(VelaSdkVersion)' == ''">2.0.2</VelaSdkVersion>
     <!-- 去掉预发布后缀的数字版(AssemblyVersion/FileVersion 不接受后缀)与主版本号。 -->
     <VelaSdkVersionCore>$([System.Text.RegularExpressions.Regex]::Replace($(VelaSdkVersion), '-.*$', ''))</VelaSdkVersionCore>
     <VelaSdkMajor>$([System.Text.RegularExpressions.Regex]::Replace($(VelaSdkVersionCore), '\..*$', ''))</VelaSdkMajor>
@@ -59,7 +59,7 @@
       改这里 = 改插件生态的 Avalonia 版本,必须与宿主同一波发布,并且让 cli 仓库
       跟着抬一次 VelaSdkPackageVersion —— 否则它那道核对会红。
     -->
-    <VelaAvaloniaVersion>12.1.1</VelaAvaloniaVersion>
+    <VelaAvaloniaVersion>12.1.2</VelaAvaloniaVersion>
     <!-- AvaloniaEdit 走自己的版本线(程序集名 AvaloniaEdit 同样命中装载器的 "Avalonia" 前缀,
          运行时一律回落到宿主那份),因此同样必须与宿主一致。 -->
     <VelaAvaloniaEditVersion>12.0.0</VelaAvaloniaEditVersion>

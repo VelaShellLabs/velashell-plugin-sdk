@@ -121,5 +121,5 @@ public static class VelaPluginApi
     /// 把"用户点了不"与"连不上"这两条路也能测到。
     /// </para>
     /// </summary>
-    public const string SdkVersion = "2.0.0";
+    public const string SdkVersion = "2.0.2";
 }
