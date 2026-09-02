@@ -12,7 +12,7 @@
 | `InMemoryStorage` | `IPluginStorage`（KV 存储）。 |
 | `FakeSecretsAndClipboard` | `ISecretsApi`（机密）与 `IClipboardApi`（剪贴板）。 |
 | `InMemoryTimeSeries` | `ITimeSeriesApi`（时序写入与查询）。 |
-| `FakeSessions` | `ISessionsApi`：`AddConnected(...)` 造出一条已连接会话。 |
+| `FakeSessions` | `ISessionsApi`：`AddConnected(...)` 造一条已连接会话，`AddSaved(...)` 造一条已保存配置；`DenyOpen` / `OpenFailure` 模拟「用户点了不」与「连不上」，`LastOpenReason` 用来断言那句给用户看的理由确实传上去了。 |
 | `FakeRemoteExec` | `IRemoteExecApi`：用 `Handler` 委托按命令文本给定输出。 |
 | `FakeRemoteFs` | `IRemoteFsApi`（远程文件读写与列目录）。 |
 | `FakeTerminal` | `ITerminalApi`（读终端尾部输出、回写终端）。 |
