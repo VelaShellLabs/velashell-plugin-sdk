@@ -96,7 +96,7 @@ public static class VelaPluginApi
     /// <c>VelaShell.PluginSdk.Testing</c> 的 <c>TestPluginContext</c>,它已经带好了。
     /// </para>
     /// <para>
-    /// <b>TBD</b>(发版时替换为实际版本号)给会话能力加了三个方法:
+    /// <b>2.0.2</b> 给会话能力加了三个方法:
     /// <see cref="Sessions.ISessionsApi.ListSavedAsync" />(已保存的连接配置,含此刻没连着的)、
     /// <see cref="Sessions.ISessionsApi.OpenAsync" />(请求宿主打开其中一条)与
     /// <see cref="Sessions.ISessionsApi.CloseAsync" />(只能关自己打开的那些)。
@@ -114,7 +114,7 @@ public static class VelaPluginApi
     /// </para>
     /// <para>
     /// 仍是只增不改,<see cref="Level" /> 不动;用到这一档的插件靠
-    /// <c>minSdkVersion: "TBD"</c> 在发现期拦住老宿主。
+    /// <c>minSdkVersion: "2.0.2"</c> 在发现期拦住老宿主。
     /// 自己写了 <c>ISessionsApi</c> 实现的(多半是测试替身)要补上这三个成员 ——
     /// <c>VelaShell.PluginSdk.Testing</c> 的 <c>FakeSessions</c> 已经带好了,
     /// 还附带 <c>DenyOpen</c> / <c>OpenFailure</c> / <c>LastOpenReason</c> 三个钩子,
