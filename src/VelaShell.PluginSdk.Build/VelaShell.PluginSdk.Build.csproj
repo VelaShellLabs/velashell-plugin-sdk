@@ -38,7 +38,7 @@
          `dotnet add package` 认不出这条依赖,而这个包正是要靠它们来更新的。
          权威值是本仓库根 Directory.Build.props 的 $(VelaAvaloniaVersion);
          下面的 VerifyAvaloniaVersionPin 会把两者比一遍(VELA1006)。 -->
-    <PackageReference Include="Avalonia" Version="[12.1.2]" ExcludeAssets="runtime" PrivateAssets="none" />
+    <PackageReference Include="Avalonia" Version="[12.1.3]" ExcludeAssets="runtime" PrivateAssets="none" />
 
     <!-- 契约 SDK 走 **ProjectReference**(2026-09-11 本包搬进本仓库起)。
          这正是"搬过来"要的效果:.Build 与 VelaShell.PluginSdk 同仓库、同版本、同一次发布,
