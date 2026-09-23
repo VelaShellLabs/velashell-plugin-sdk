@@ -68,7 +68,7 @@
       把 .Build 的两处副本(csproj 上那条精确区间、build/*.props 里的同名默认值)一起改掉,
       否则 VELA1000 / VELA1006 会红。
     -->
-    <VelaAvaloniaVersion>12.1.2</VelaAvaloniaVersion>
+    <VelaAvaloniaVersion>12.1.3</VelaAvaloniaVersion>
     <!-- AvaloniaEdit 走自己的版本线(程序集名 AvaloniaEdit 同样命中装载器的 "Avalonia" 前缀,
          运行时一律回落到宿主那份),因此同样必须与宿主一致。 -->
     <VelaAvaloniaEditVersion>12.0.0</VelaAvaloniaEditVersion>
