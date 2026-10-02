@@ -120,25 +120,6 @@ public static class VelaPluginApi
     /// 还附带 <c>DenyOpen</c> / <c>OpenFailure</c> / <c>LastOpenReason</c> 三个钩子,
     /// 把"用户点了不"与"连不上"这两条路也能测到。
     /// </para>
-    /// <para>
-    /// <b>TBD</b>(版本号发版时替换)给连接对话框加了两样东西。① 声明式字段的**版式**:
-    /// <see cref="Protocols.ProtocolSettingField.Section" />(分节,可并入宿主的基本 / 连接目标 / 身份验证节)、
-    /// <see cref="Protocols.ProtocolSettingField.Width" />(一行放几个)、
-    /// <see cref="Protocols.ProtocolSettingField.Presentation" />(分段按钮 / 带语气色的标签 / 开关卡片)、
-    /// <see cref="Protocols.ProtocolSettingField.Placement" />(右侧栏),以及新形态
-    /// <see cref="Protocols.ProtocolSettingKind.HostList" />(一行一台的主机列表)。
-    /// ② 工作台的**连接检查** <see cref="Workspaces.IWorkspaceConnectionInspector" />:
-    /// 随输入实时更新的连接串预览、逐步的测试结果与测试时发现的成员,宿主画在对话框的右侧栏里。
-    /// 在这之前,一张十几个字段的 MongoDB 连接表只能一列铺到底,测试连接只有"成功 / 失败 + 一句原因"——
-    /// 走隧道、带副本集与 SCRAM 认证的连接失败时,用户只能从一句"选服超时"里猜是哪一环断了。
-    /// </para>
-    /// <para>
-    /// 两样都是声明式的(插件交数据、宿主画),都只增不改,<see cref="Level" /> 不动。
-    /// 但契约程序集总是用宿主那一份:老宿主上没有这些成员,插件给 <c>Section</c> / <c>Tone</c> 之类赋值
-    /// 就是运行期 <see cref="MissingMethodException" />,实现了连接检查接口的工作台提供者在装载时就
-    /// <see cref="TypeLoadException" />。所以用到其中**任何一样**的插件都要声明
-    /// <c>minSdkVersion: "TBD"</c>(发版时替换),在发现期拦住老宿主。
-    /// </para>
     /// </summary>
     public const string SdkVersion = "2.0.2";
 }
