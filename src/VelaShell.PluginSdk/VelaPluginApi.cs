@@ -120,6 +120,15 @@ public static class VelaPluginApi
     /// 还附带 <c>DenyOpen</c> / <c>OpenFailure</c> / <c>LastOpenReason</c> 三个钩子,
     /// 把"用户点了不"与"连不上"这两条路也能测到。
     /// </para>
+    /// <para>
+    /// <b>2.0.7 加的连接对话框契约已撤回,TBD(版本号发版时替换)起不再提供</b>:
+    /// 声明式字段的版式(<c>Section</c> / <c>Width</c> / <c>Presentation</c> / <c>Placement</c>、
+    /// 选项的 <c>Tone</c>)、<c>ProtocolSettingKind.HostList</c> 与工作台的连接检查
+    /// <c>IWorkspaceConnectionInspector</c>。它们只为把 MongoDB 插件的连接表单画进宿主的新建连接窗口而加;
+    /// 那个插件随后改为像 Docker 面板一样自己管理连接,宿主也随之撤掉了对应实现 —— 留着就是一份
+    /// 没人用、却要宿主永远背着的契约。这是一次删除公开面:2.0.7 只存在了不到一天、没有已发布的插件用到,
+    /// 所以 <see cref="Level" /> 不动;请不要再基于 2.0.7 的这几个成员写插件。
+    /// </para>
     /// </summary>
     public const string SdkVersion = "2.0.2";
 }
