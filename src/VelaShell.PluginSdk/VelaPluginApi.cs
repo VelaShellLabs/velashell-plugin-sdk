@@ -121,23 +121,13 @@ public static class VelaPluginApi
     /// 把"用户点了不"与"连不上"这两条路也能测到。
     /// </para>
     /// <para>
-    /// <b>TBD</b>(版本号发版时替换)给连接对话框加了两样东西。① 声明式字段的**版式**:
-    /// <see cref="Protocols.ProtocolSettingField.Section" />(分节,可并入宿主的基本 / 连接目标 / 身份验证节)、
-    /// <see cref="Protocols.ProtocolSettingField.Width" />(一行放几个)、
-    /// <see cref="Protocols.ProtocolSettingField.Presentation" />(分段按钮 / 带语气色的标签 / 开关卡片)、
-    /// <see cref="Protocols.ProtocolSettingField.Placement" />(右侧栏),以及新形态
-    /// <see cref="Protocols.ProtocolSettingKind.HostList" />(一行一台的主机列表)。
-    /// ② 工作台的**连接检查** <see cref="Workspaces.IWorkspaceConnectionInspector" />:
-    /// 随输入实时更新的连接串预览、逐步的测试结果与测试时发现的成员,宿主画在对话框的右侧栏里。
-    /// 在这之前,一张十几个字段的 MongoDB 连接表只能一列铺到底,测试连接只有"成功 / 失败 + 一句原因"——
-    /// 走隧道、带副本集与 SCRAM 认证的连接失败时,用户只能从一句"选服超时"里猜是哪一环断了。
-    /// </para>
-    /// <para>
-    /// 两样都是声明式的(插件交数据、宿主画),都只增不改,<see cref="Level" /> 不动。
-    /// 但契约程序集总是用宿主那一份:老宿主上没有这些成员,插件给 <c>Section</c> / <c>Tone</c> 之类赋值
-    /// 就是运行期 <see cref="MissingMethodException" />,实现了连接检查接口的工作台提供者在装载时就
-    /// <see cref="TypeLoadException" />。所以用到其中**任何一样**的插件都要声明
-    /// <c>minSdkVersion: "TBD"</c>(发版时替换),在发现期拦住老宿主。
+    /// <b>2.0.7 加的连接对话框契约已撤回,TBD(版本号发版时替换)起不再提供</b>:
+    /// 声明式字段的版式(<c>Section</c> / <c>Width</c> / <c>Presentation</c> / <c>Placement</c>、
+    /// 选项的 <c>Tone</c>)、<c>ProtocolSettingKind.HostList</c> 与工作台的连接检查
+    /// <c>IWorkspaceConnectionInspector</c>。它们只为把 MongoDB 插件的连接表单画进宿主的新建连接窗口而加;
+    /// 那个插件随后改为像 Docker 面板一样自己管理连接,宿主也随之撤掉了对应实现 —— 留着就是一份
+    /// 没人用、却要宿主永远背着的契约。这是一次删除公开面:2.0.7 只存在了不到一天、没有已发布的插件用到,
+    /// 所以 <see cref="Level" /> 不动;请不要再基于 2.0.7 的这几个成员写插件。
     /// </para>
     /// </summary>
     public const string SdkVersion = "2.0.2";

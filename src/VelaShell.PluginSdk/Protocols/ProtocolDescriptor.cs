@@ -58,33 +58,13 @@ public enum ProtocolSettingKind
     /// 而且未来每个数据库插件都不必重写一遍。
     /// </para>
     /// </summary>
-    SshSession,
-
-    /// <summary>
-    /// 一组 <c>主机:端口</c>:宿主画成一行一个(主机 + 端口 + 删除),底下一个「添加主机」。
-    /// 落盘值是英文逗号分隔的 <c>host:port</c> 列表(IPv6 写成 <c>[::1]:27017</c>);
-    /// 新加的一行端口取连接类型(或当前变体)的默认端口。
-    /// <para>
-    /// 给"一个连接对应好几台机器"的类型用 —— MongoDB 副本集、Redis 哨兵、Elasticsearch 集群。
-    /// 在这之前只能写成一个逗号分隔的文本框,用户看不出填了几台、哪一台写错了。
-    /// 连接检查(<see cref="Workspaces.IWorkspaceConnectionInspector" />)报回的
-    /// <see cref="Workspaces.WorkspaceProbeEndpoint" /> 与某一行地址相同时,宿主在那一行旁边标出它的角色。
-    /// </para>
-    /// </summary>
-    HostList
+    SshSession
 }
 
 /// <summary>下拉选项。</summary>
 /// <param name="Value">落盘的值(稳定标识,不随语言变化)。</param>
 /// <param name="Label">展示文案(插件自行本地化)。</param>
-public sealed record ProtocolSettingChoice(string Value, string Label)
-{
-    /// <summary>
-    /// 语气色:<see cref="ProtocolSettingPresentation.Chips" /> 画法下选中时用它着色(其余画法忽略)。
-    /// 环境标记就是活例子:生产给 <see cref="ProtocolTone.Danger" />,一眼看得出这条连接要小心。
-    /// </summary>
-    public ProtocolTone Tone { get; init; }
-}
+public sealed record ProtocolSettingChoice(string Value, string Label);
 
 /// <summary>
 /// 一个字段的显示条件:另一个字段取到指定值时才显示本字段。
@@ -215,26 +195,6 @@ public sealed record ProtocolSettingField
     /// </para>
     /// </summary>
     public ProtocolSettingVisibility? VisibleWhen { get; init; }
-
-    /// <summary>
-    /// 归入哪一节。<see langword="null" />(默认)= 插件自己的默认节(宿主的「<i>连接类型</i> 设置」)。
-    /// 取 <see cref="ProtocolSettingSection" /> 的常量时并入宿主对应的那一节;其余字符串是插件自己的一节,
-    /// 字符串就是节标题(插件自行本地化),同标题的字段归在一起,节按首次出现的顺序排。
-    /// <para>
-    /// 一张很长的参数表需要分组才读得下去:「服务器 / 认证 / 安全通道」各成一节,
-    /// 用户找"TLS 证书在哪"时扫一眼节标题就到了。分组仍然只是声明 —— 节怎么画、间距多少归宿主。
-    /// </para>
-    /// </summary>
-    public string? Section { get; init; }
-
-    /// <summary>占一行的多少;默认独占一行。见 <see cref="ProtocolFieldWidth" />。</summary>
-    public ProtocolFieldWidth Width { get; init; }
-
-    /// <summary>画法;默认按 <see cref="Kind" /> 的默认控件。见 <see cref="ProtocolSettingPresentation" />。</summary>
-    public ProtocolSettingPresentation Presentation { get; init; }
-
-    /// <summary>放在主表单还是右侧栏;默认主表单。见 <see cref="ProtocolFieldPlacement" />。</summary>
-    public ProtocolFieldPlacement Placement { get; init; }
 }
 
 /// <summary>协议在文件管理器里的能力位。宿主据此启用/隐藏对应操作,避免给出必然失败的菜单项。</summary>
