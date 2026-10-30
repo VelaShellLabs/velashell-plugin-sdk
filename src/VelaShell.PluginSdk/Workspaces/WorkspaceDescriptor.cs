@@ -86,6 +86,24 @@ public sealed record WorkspaceVariant
     public required string Value { get; init; }
 
     /// <summary>
+    /// 类型选择卡片上的图标;<see langword="null" /> 回落到 <see cref="WorkspaceDescriptor.Icon" />。
+    /// <para>
+    /// 卡片与会话标签页共用 <see cref="PluginIcon" /> 这一种形态。卡片上的**名字**不在变体上重复声明:
+    /// 宿主取 <see cref="WorkspaceDescriptor.VariantKey" /> 那个字段的
+    /// <see cref="ProtocolSettingField.Choices" /> 里 <c>Value</c> 与 <see cref="Value" /> 相同那一项的 <c>Label</c>
+    /// —— 同一个名字只写一处,改文案不会两边分家。
+    /// </para>
+    /// <para>
+    /// 出不出卡片不是 SDK 开关,条件由宿主决定(现行:<see cref="WorkspaceDescriptor.VariantKey" /> 指向的字段是
+    /// <see cref="ProtocolSettingKind.Choice" />、不隐藏(<see cref="ProtocolSettingField.IsHidden" /> 为
+    /// <see langword="false" />)、不可手输(<see cref="ProtocolSettingField.AllowsCustomValue" /> 为
+    /// <see langword="false" />)、至少两个候选项)。
+    /// </para>
+    /// <para>可用版本:TBD(发版时替换)。</para>
+    /// </summary>
+    public PluginIcon? Icon { get; init; }
+
+    /// <summary>
     /// 这一变体的默认端口。
     /// <para>
     /// 宿主沿用与切换页签**同一套**判定:只有在用户没手填过端口时才跟随,
@@ -159,6 +177,23 @@ public sealed record WorkspaceDescriptor
 
     /// <summary>专属设置的表单声明(按顺序渲染);形态与语义见 <see cref="ProtocolSettingField" />。</summary>
     public IReadOnlyList<ProtocolSettingField> Fields { get; init; } = [];
+
+    /// <summary>
+    /// 连接对话框里介于「常规」与「高级」之间的自定义分页,按声明顺序渲染;字段用
+    /// <see cref="ProtocolSettingField.Page" /> 引用其中一页的键。
+    /// <para>
+    /// 顺序即页签顺序。「常规」「高级」两页的文案由宿主出,不在此列表;
+    /// <see cref="ProtocolSettingPage.Label" /> 由插件自行本地化(与字段的 <c>Label</c>、<c>Choices</c>
+    /// 同一套做法:locale 变化时插件重新注册描述符)。
+    /// </para>
+    /// <para>
+    /// <b>为什么不是枚举</b>:「数据库」「SSL」是领域页,宿主无法为任意插件预备一套封闭集合的本地化文案;
+    /// 做成枚举的话,每加一页都要发一版 SDK。<b>为什么是键不是文案</b>:显隐、落盘、测试都按键比较,
+    /// 文案换语言不影响。
+    /// </para>
+    /// <para>可用版本:TBD(发版时替换)。</para>
+    /// </summary>
+    public IReadOnlyList<ProtocolSettingPage> Pages { get; init; } = [];
 
     /// <summary>能力位。</summary>
     public WorkspaceFeatures Features { get; init; } = WorkspaceFeatures.None;
