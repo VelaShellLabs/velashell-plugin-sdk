@@ -79,7 +79,7 @@ public sealed record ProtocolSettingChoice(string Value, string Label);
 /// 封闭集合的本地化文案;做成枚举的话,插件每多要一页就得等 SDK 发一版。
 /// <b>为什么字段引用的是键不是文案</b>:显隐、落盘、测试都按键比较,文案换语言不影响。
 /// </para>
-/// <para>可用版本:TBD(发版时替换)。</para>
+/// <para>可用版本:2.1.5。</para>
 /// </summary>
 /// <param name="Key">页键:稳定标识,序数比较,不随语言变化。</param>
 /// <param name="Label">页签文案(插件自行本地化)。</param>
@@ -225,7 +225,7 @@ public sealed record ProtocolSettingField
     /// 只对声明了分页列表的描述符有效(<see cref="Workspaces.WorkspaceDescriptor.Pages" />);
     /// <see cref="ProtocolDescriptor" /> 暂无分页列表,文件协议的字段上这个值被忽略。
     /// </para>
-    /// <para>可用版本:TBD(发版时替换)。</para>
+    /// <para>可用版本:2.1.5。</para>
     /// </summary>
     public string? Page { get; init; }
 
