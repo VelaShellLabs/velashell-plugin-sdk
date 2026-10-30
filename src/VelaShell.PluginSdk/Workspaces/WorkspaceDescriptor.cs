@@ -94,8 +94,10 @@ public sealed record WorkspaceVariant
     /// —— 同一个名字只写一处,改文案不会两边分家。
     /// </para>
     /// <para>
-    /// 出不出卡片不是 SDK 开关,由宿主判定:<see cref="WorkspaceDescriptor.VariantKey" /> 指向的字段是
-    /// <see cref="ProtocolSettingKind.Choice" />、且候选项不少于两个时才出。
+    /// 出不出卡片不是 SDK 开关,条件由宿主决定(现行:<see cref="WorkspaceDescriptor.VariantKey" /> 指向的字段是
+    /// <see cref="ProtocolSettingKind.Choice" />、不隐藏(<see cref="ProtocolSettingField.IsHidden" /> 为
+    /// <see langword="false" />)、不可手输(<see cref="ProtocolSettingField.AllowsCustomValue" /> 为
+    /// <see langword="false" />)、至少两个候选项)。
     /// </para>
     /// <para>可用版本:TBD(发版时替换)。</para>
     /// </summary>

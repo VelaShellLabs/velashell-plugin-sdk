@@ -214,8 +214,8 @@ public sealed record ProtocolSettingField
     /// 自定义分页这三样都不做。
     /// </para>
     /// <para>
-    /// 键不在描述符的分页列表里时,宿主按 <see langword="null" /> 处理:不报错,与
-    /// <see cref="VisibleWhen" /> 引用了不存在的键是同一态度。插件应当用契约测试守住键的拼写。
+    /// 键不在 <see cref="Workspaces.WorkspaceDescriptor.Pages" /> 里时,宿主按 <see langword="null" />
+    /// (默认位置)处理,不报错;插件应以契约测试守住。
     /// </para>
     /// <para>
     /// 与 <see cref="VisibleWhen" /> 是「与」关系,和 <see cref="IsAdvanced" /> 一样:字段在它那一页里照常按条件显隐;
