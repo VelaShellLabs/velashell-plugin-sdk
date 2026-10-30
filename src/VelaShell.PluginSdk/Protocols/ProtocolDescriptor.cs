@@ -67,6 +67,25 @@ public enum ProtocolSettingKind
 public sealed record ProtocolSettingChoice(string Value, string Label);
 
 /// <summary>
+/// 连接对话框里的一个自定义分页(「数据库」「SSL」),由连接类型声明、字段用
+/// <see cref="ProtocolSettingField.Page" /> 引用。
+/// <para>
+/// 宿主把自定义分页排在「常规」与「高级」之间,按声明顺序渲染;「常规」「高级」两页的文案由宿主出,
+/// 不在这份列表里。<see cref="Label" /> 由插件自行本地化 —— 与字段的 <c>Label</c>、<c>Choices</c>
+/// 同一套做法:locale 变化时插件重新注册描述符。
+/// </para>
+/// <para>
+/// <b>为什么是键 + 文案而不是枚举</b>:「数据库」「SSL」是领域页,宿主无法为任意插件预备一套
+/// 封闭集合的本地化文案;做成枚举的话,插件每多要一页就得等 SDK 发一版。
+/// <b>为什么字段引用的是键不是文案</b>:显隐、落盘、测试都按键比较,文案换语言不影响。
+/// </para>
+/// <para>可用版本:TBD(发版时替换)。</para>
+/// </summary>
+/// <param name="Key">页键:稳定标识,序数比较,不随语言变化。</param>
+/// <param name="Label">页签文案(插件自行本地化)。</param>
+public sealed record ProtocolSettingPage(string Key, string Label);
+
+/// <summary>
 /// 一个字段的显示条件:另一个字段取到指定值时才显示本字段。
 /// <para>
 /// 为什么需要它:一张平铺的参数表会把**互斥**的参数一起摆出来。Redis 就是活例子 ——
@@ -185,6 +204,30 @@ public sealed record ProtocolSettingField
     /// </para>
     /// </summary>
     public bool IsAdvanced { get; init; }
+
+    /// <summary>
+    /// 所属分页的键(<see cref="ProtocolSettingPage.Key" />,序数比较);<see langword="null" /> 表示默认位置。
+    /// <para>
+    /// <b>优先于 <see cref="IsAdvanced" /></b>:填了本值的字段进那一页,<see cref="IsAdvanced" /> 不再看;
+    /// <see cref="IsAdvanced" /> 只决定**没有**分页的字段去「高级」还是「常规」。
+    /// 为什么不把「高级」也做成一页:它有宿主专属的行为 —— 数量徽标、改过值的圆点、编辑既有配置时自动展开 ——
+    /// 自定义分页这三样都不做。
+    /// </para>
+    /// <para>
+    /// 键不在描述符的分页列表里时,宿主按 <see langword="null" /> 处理:不报错,与
+    /// <see cref="VisibleWhen" /> 引用了不存在的键是同一态度。插件应当用契约测试守住键的拼写。
+    /// </para>
+    /// <para>
+    /// 与 <see cref="VisibleWhen" /> 是「与」关系,和 <see cref="IsAdvanced" /> 一样:字段在它那一页里照常按条件显隐;
+    /// 一页的字段全都不可见时页签隐藏,正停在那一页的会落回「常规」。
+    /// </para>
+    /// <para>
+    /// 只对声明了分页列表的描述符有效(<see cref="Workspaces.WorkspaceDescriptor.Pages" />);
+    /// <see cref="ProtocolDescriptor" /> 暂无分页列表,文件协议的字段上这个值被忽略。
+    /// </para>
+    /// <para>可用版本:TBD(发版时替换)。</para>
+    /// </summary>
+    public string? Page { get; init; }
 
     /// <summary>
     /// 显示条件;<see langword="null" /> 表示始终显示。见 <see cref="ProtocolSettingVisibility" />。
