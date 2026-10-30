@@ -99,7 +99,7 @@ public sealed record WorkspaceVariant
     /// <see langword="false" />)、不可手输(<see cref="ProtocolSettingField.AllowsCustomValue" /> 为
     /// <see langword="false" />)、至少两个候选项)。
     /// </para>
-    /// <para>可用版本:TBD(发版时替换)。</para>
+    /// <para>可用版本:2.1.5。</para>
     /// </summary>
     public PluginIcon? Icon { get; init; }
 
@@ -191,7 +191,7 @@ public sealed record WorkspaceDescriptor
     /// 做成枚举的话,每加一页都要发一版 SDK。<b>为什么是键不是文案</b>:显隐、落盘、测试都按键比较,
     /// 文案换语言不影响。
     /// </para>
-    /// <para>可用版本:TBD(发版时替换)。</para>
+    /// <para>可用版本:2.1.5。</para>
     /// </summary>
     public IReadOnlyList<ProtocolSettingPage> Pages { get; init; } = [];
 
