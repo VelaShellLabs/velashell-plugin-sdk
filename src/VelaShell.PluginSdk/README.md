@@ -18,7 +18,7 @@
 | `Manifest/` | `plugin.json` 的模型、读取器与错误类型（`PluginManifest`/`PluginManifestReader`/`PluginManifestException`）。 |
 | `Hosting/` | 装载侧工具：`PluginAssemblyLoadContext`（可收集 ALC，`Avalonia*` 前缀回落到装载方以保证类型同一）、`PluginEntryLocator`、`JsonFilePluginStorage`。 |
 | `Rpc/` | 隔离模式的线协议：`PluginRpc`（方法名常量与载荷记录）、`RpcConnection`、`RpcMessage`。 |
-| `PluginPermissionDeniedException.cs` `PluginSessionNotFoundException.cs` `PluginSessionOpenException.cs` `PluginTransferRejectedException.cs` | 跨边界的异常类型（「用户拒绝」「会话不在」「连不上」「传输启动前被拒」各是各的类型）。 |
+| `PluginPermissionDeniedException.cs` `PluginSessionNotFoundException.cs` `PluginSessionOpenException.cs` `PluginTransferRejectedException.cs` `SecretsLockedException.cs` | 跨边界的异常类型（「用户拒绝」「会话不在」「连不上」「传输启动前被拒」「机密存储锁着」各是各的类型）。 |
 
 ## 🔑 纪律
 
