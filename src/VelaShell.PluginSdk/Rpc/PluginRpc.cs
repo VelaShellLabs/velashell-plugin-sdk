@@ -96,7 +96,7 @@ public static class PluginRpc
     /// 条件撤回:只在这一代的批准还没生效时撤下传输(载荷 <see cref="FsTransferWithdrawRequest" />,
     /// 应答 <see cref="RemoteFs.RemoteTransferWithdrawResult" />)。握手未宣告
     /// <see cref="HandshakeResponse.SupportsTransferWithdraw" /> 时 PluginHost 不发这条,在插件进程内直接抛不支持,
-    /// 也不改发 <see cref="FsTransferCancel" />。可用版本:TBD(发版时替换)。
+    /// 也不改发 <see cref="FsTransferCancel" />。可用版本:2.1.4。
     /// </summary>
     public const string FsTransferWithdraw = "fs/transfer/withdraw";
 
@@ -299,7 +299,7 @@ public sealed record HandshakeResponse(int ApiLevel, string HostVersion, string 
 
     /// <summary>
     /// 支持 <see cref="PluginRpc.FsTransferWithdraw" />(只撤批准还没生效的传输);缺席即旧宿主,不支持,
-    /// 不可退化成无条件取消。可用版本:TBD(发版时替换)。
+    /// 不可退化成无条件取消。可用版本:2.1.4。
     /// </summary>
     public bool SupportsTransferWithdraw { get; init; }
 }
@@ -387,7 +387,7 @@ public sealed record FsTransferCancelRequest(string TransferId, long ExpectedGen
 
 /// <summary>
 /// 条件撤回请求:只在这一代的批准还没生效时撤下,判断与撤下由宿主在同一步完成;旧代次撤回不能作用于恢复后的新代次。
-/// 可用版本:TBD(发版时替换)。
+/// 可用版本:2.1.4。
 /// </summary>
 public sealed record FsTransferWithdrawRequest(string TransferId, long ExpectedGeneration);
 

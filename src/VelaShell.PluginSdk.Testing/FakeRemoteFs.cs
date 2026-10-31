@@ -20,7 +20,7 @@ public sealed class FakeRemoteFs : IRemoteFsApi
 
     /// <summary>
     /// 显式模拟宿主是否实现条件撤回(<see cref="IRemoteFsApi.WithdrawPendingTransferAsync" />);默认否,
-    /// 不退化成无条件取消。可用版本:TBD(发版时替换)。
+    /// 不退化成无条件取消。可用版本:2.1.4。
     /// </summary>
     public bool SupportsTransferWithdraw { get; set; }
 
@@ -59,7 +59,7 @@ public sealed class FakeRemoteFs : IRemoteFsApi
 
     /// <summary>
     /// 条件撤回脚本。「批准与撤回先到者赢」由测试自己模拟:替身不编造结论,没有脚本时明确不支持,
-    /// 也不改走 <see cref="CancelTransferHandler" />。可用版本:TBD(发版时替换)。
+    /// 也不改走 <see cref="CancelTransferHandler" />。可用版本:2.1.4。
     /// </summary>
     public Func<string, long, CancellationToken, Task<RemoteTransferWithdrawResult>>? WithdrawTransferHandler { get; set; }
 

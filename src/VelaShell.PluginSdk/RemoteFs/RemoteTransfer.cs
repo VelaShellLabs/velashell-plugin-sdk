@@ -19,7 +19,7 @@ public enum RemoteTransferPhase
     /// <para>
     /// 宣告 <see cref="IRemoteFsApi.SupportsTransferWithdraw" /> 的宿主在批准生效的<b>同一步</b>把任务移出这一阶段
     /// (上传与下载同一口径,批准之后等传输槽的也不再报 Approval),所以这样的宿主报 Approval 就等于「这一代的批准还没生效」。
-    /// 可用版本:TBD(发版时替换)。
+    /// 可用版本:2.1.4。
     /// </para>
     /// </summary>
     Approval,
@@ -61,7 +61,7 @@ public enum RemoteTransferRejectReason
 /// 批准已生效 → <see cref="PastApproval" />;否则登记过取消 → <see cref="Withdrawn" />;
 /// 否则已经收尾 → <see cref="AlreadyEnded" />;否则本次调用登记取消 → <see cref="Withdrawn" />。
 /// </para>
-/// <para>可用版本:TBD(发版时替换)。</para>
+/// <para>可用版本:2.1.4。</para>
 /// </summary>
 public enum RemoteTransferWithdrawOutcome
 {
@@ -93,7 +93,7 @@ public enum RemoteTransferWithdrawOutcome
 
 /// <summary>
 /// 条件撤回的结果:结论与调用之后的权威快照。也是隔离进程 <c>fs/transfer/withdraw</c> 的应答载荷。
-/// <para>可用版本:TBD(发版时替换)。</para>
+/// <para>可用版本:2.1.4。</para>
 /// </summary>
 public sealed record RemoteTransferWithdrawResult
 {
