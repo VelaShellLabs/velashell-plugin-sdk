@@ -73,6 +73,12 @@ public static class RpcErrorCodes
     /// </summary>
     public const string TransferRejected = "transfer-rejected";
 
+    /// <summary>
+    /// 机密存储锁着:用户设了主密码而此刻没解锁(<see cref="SecretsLockedException" />)。
+    /// 只有握手宣告了 <see cref="HandshakeResponse.SupportsSecretsLocked" /> 的宿主才应答它。可用版本:TBD(发版时替换)。
+    /// </summary>
+    public const string SecretsLocked = "secrets-locked";
+
     /// <summary>未分类错误。</summary>
     public const string Unknown = "error";
 
@@ -85,6 +91,8 @@ public static class RpcErrorCodes
         PluginSessionOpenException => SessionOpenFailed,
         // 同上(InvalidOperationException 的子类)
         PluginTransferRejectedException rejected => TransferRejectedCode(rejected.Reason),
+        // 同上(InvalidOperationException 的子类);折成 invalid-op 的话,隔离插件就分不出「锁着」与「状态不对」
+        SecretsLockedException => SecretsLocked,
         TimeoutException => Timeout,
         OperationCanceledException => Cancelled,
         NotSupportedException => NotSupported,
@@ -105,6 +113,7 @@ public static class RpcErrorCodes
         BadArguments => new ArgumentException(message),
         InvalidOperation => new InvalidOperationException(message),
         TransferRejected => new PluginTransferRejectedException(RemoteFs.RemoteTransferRejectReason.Unknown, message),
+        SecretsLocked => new SecretsLockedException(message),
         _ when code?.StartsWith(TransferRejected + ":", StringComparison.Ordinal) == true
             => new PluginTransferRejectedException(ParseRejectReason(code[(TransferRejected.Length + 1)..]), message),
         _ => new RpcRemoteException(code ?? Unknown, message)

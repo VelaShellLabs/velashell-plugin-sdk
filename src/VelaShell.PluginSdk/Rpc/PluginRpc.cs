@@ -96,7 +96,7 @@ public static class PluginRpc
     /// 条件撤回:只在这一代的批准还没生效时撤下传输(载荷 <see cref="FsTransferWithdrawRequest" />,
     /// 应答 <see cref="RemoteFs.RemoteTransferWithdrawResult" />)。握手未宣告
     /// <see cref="HandshakeResponse.SupportsTransferWithdraw" /> 时 PluginHost 不发这条,在插件进程内直接抛不支持,
-    /// 也不改发 <see cref="FsTransferCancel" />。可用版本:TBD(发版时替换)。
+    /// 也不改发 <see cref="FsTransferCancel" />。可用版本:2.1.4。
     /// </summary>
     public const string FsTransferWithdraw = "fs/transfer/withdraw";
 
@@ -184,7 +184,11 @@ public static class PluginRpc
     /// <summary>时序:按标签删除序列数据。</summary>
     public const string TimeSeriesDelete = "ts/delete";
 
-    /// <summary>机密:读 / 写 / 删(机密只存宿主侧,值仅在本机管道上瞬时传输)。</summary>
+    /// <summary>
+    /// 机密:读 / 写 / 删(机密只存宿主侧,值仅在本机管道上瞬时传输)。
+    /// 握手宣告了 <see cref="HandshakeResponse.SupportsSecretsLocked" /> 的宿主在机密存储锁着时
+    /// 对读 / 写应答 <see cref="RpcErrorCodes.SecretsLocked" />、删照常;无论新旧,都不会对一个已存的机密应答 null。
+    /// </summary>
     public const string SecretsGet = "secrets/get";
 
     /// <summary>机密写入。</summary>
@@ -299,9 +303,16 @@ public sealed record HandshakeResponse(int ApiLevel, string HostVersion, string 
 
     /// <summary>
     /// 支持 <see cref="PluginRpc.FsTransferWithdraw" />(只撤批准还没生效的传输);缺席即旧宿主,不支持,
-    /// 不可退化成无条件取消。可用版本:TBD(发版时替换)。
+    /// 不可退化成无条件取消。可用版本:2.1.4。
     /// </summary>
     public bool SupportsTransferWithdraw { get; init; }
+
+    /// <summary>
+    /// 机密存储锁着(用户设了主密码、此刻没解锁)时,<see cref="PluginRpc.SecretsGet" /> / <see cref="PluginRpc.SecretsSet" />
+    /// 不弹解锁框、直接应答 <see cref="RpcErrorCodes.SecretsLocked" />;PluginHost 据此给出
+    /// <see cref="Secrets.ISecretsApi.SupportsLockedState" />。缺席即旧宿主,不会应答这个错误码。可用版本:TBD(发版时替换)。
+    /// </summary>
+    public bool SupportsSecretsLocked { get; init; }
 }
 
 /// <summary>会话查询参数。</summary>
@@ -387,7 +398,7 @@ public sealed record FsTransferCancelRequest(string TransferId, long ExpectedGen
 
 /// <summary>
 /// 条件撤回请求:只在这一代的批准还没生效时撤下,判断与撤下由宿主在同一步完成;旧代次撤回不能作用于恢复后的新代次。
-/// 可用版本:TBD(发版时替换)。
+/// 可用版本:2.1.4。
 /// </summary>
 public sealed record FsTransferWithdrawRequest(string TransferId, long ExpectedGeneration);
 

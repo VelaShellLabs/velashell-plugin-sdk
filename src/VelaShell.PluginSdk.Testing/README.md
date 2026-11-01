@@ -10,7 +10,7 @@
 |------|-----------|
 | `TestPluginContext` | `IPluginContext` 本体，聚合下列全部替身并暴露为强类型字段。 |
 | `InMemoryStorage` | `IPluginStorage`（KV 存储）。 |
-| `FakeSecretsAndClipboard` | `ISecretsApi`（机密）与 `IClipboardApi`（剪贴板）。 |
+| `FakeSecretsAndClipboard` | `ISecretsApi`（机密）与 `IClipboardApi`（剪贴板）。`FakeSecrets.IsLocked = true` 模拟主密码还没解锁：读、写抛 `SecretsLockedException`，删照常，`Values` 原样保留、解锁后值都还在；`SupportsLockedState = false` 模拟旧宿主（锁着时改抛 `PluginPermissionDeniedException`，即用户拒绝了解锁提示）。 |
 | `InMemoryTimeSeries` | `ITimeSeriesApi`（时序写入与查询）。 |
 | `FakeSessions` | `ISessionsApi`：`AddConnected(...)` 造一条已连接会话，`AddSaved(...)` 造一条已保存配置；`DenyOpen` / `OpenFailure` 模拟「用户点了不」与「连不上」，`LastOpenReason` 用来断言那句给用户看的理由确实传上去了。 |
 | `FakeRemoteExec` | `IRemoteExecApi`：用 `Handler` 委托按命令文本给定输出。 |

@@ -72,7 +72,7 @@ public interface IRemoteFsApi
     /// <summary>
     /// 宿主是否实现 <see cref="WithdrawPendingTransferAsync" />(只撤批准还没生效的传输);旧宿主默认不支持。
     /// 与上传、下载能力各自独立:实现了独立任务的宿主不一定实现它。
-    /// <para>可用版本:TBD(发版时替换)。</para>
+    /// <para>可用版本:2.1.4。</para>
     /// </summary>
     bool SupportsTransferWithdraw => false;
 
@@ -179,7 +179,7 @@ public interface IRemoteFsApi
     /// 那一个往返的空当,要么不撤、让确认框照弹 —— 选哪条是插件的取舍。契约程序集由宿主提供:装着更旧 SDK 的宿主上
     /// 连这个成员都不存在,用到它的插件要声明对应的 <c>minSdkVersion</c>。
     /// </para>
-    /// <para>可用版本:TBD(发版时替换)。只增不改,<c>apiLevel</c> 不变。</para>
+    /// <para>可用版本:2.1.4。只增不改,<c>apiLevel</c> 不变。</para>
     /// </remarks>
     Task<RemoteTransferWithdrawResult> WithdrawPendingTransferAsync(string transferId, long expectedGeneration,
         CancellationToken cancellationToken = default)

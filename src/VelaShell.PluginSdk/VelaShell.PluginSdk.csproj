@@ -21,8 +21,10 @@
     src/Directory.Packages.props 做的;拆库之后读不到对方的文件了,于是反过来:
     **本仓库是权威**,把版本号写进包里,由每个下游在自己的构建期核对 ——
       · 宿主仓库 src/Directory.Build.targets 的 VerifyAvaloniaMatchesSdk;
-      · velashell-plugin-cli 的 VelaShell.PluginSdk.Build,见其 VerifyAvaloniaVersionPin
-        (它引用本包,因此这两个属性会直接出现在它的构建里)。
+      · velashell-plugins 的 Directory.Build.targets(VerifyAvaloniaMatchesSdk / VerifyAvaloniaEditMatchesSdk,
+        VELAP1000 / VELAP1001,守的是它测试工程里的 Avalonia 与插件编译期引的 AvaloniaEdit)。
+    本仓库的 VelaShell.PluginSdk.Build(2026-09-11 从 velashell-plugin-cli 搬来)不走这条通道:
+    同仓库,直接读 $(VelaAvaloniaVersion),见其 VerifyAvaloniaVersionPin。
 
     VelaSdkPackageVersion 一并导出:下游想在诊断信息里报"编译时用的是哪版契约"时
     不必再自己解析包版本。
