@@ -1,3 +1,4 @@
+using System.Text.Json;
 using VelaShell.PluginSdk.Protocols;
 using VelaShell.PluginSdk.Workspaces;
 
@@ -29,6 +30,42 @@ public sealed class WorkspaceDescriptorPagesTests
         Assert.AreEqual(0, descriptor.Pages.Count);
         Assert.IsNull(field.Page, "不填分页的字段留在默认位置(由 IsAdvanced 决定常规还是高级)。");
         Assert.IsNull(variant.Icon, "不填图标的变体回落到描述符图标。");
+    }
+
+    [TestMethod]
+    public void SelectionGroup_RoundTripsWithoutChangingFieldIdentityOrValue()
+    {
+        ProtocolSettingField field = new()
+        {
+            Key = "drive:C",
+            Label = "Local Disk (C:)",
+            Kind = ProtocolSettingKind.Boolean,
+            DefaultValue = "false",
+            Page = "resources",
+            SelectionGroup = new("drives", "磁盘")
+        };
+
+        string json = JsonSerializer.Serialize(field);
+        ProtocolSettingField? restored = JsonSerializer.Deserialize<ProtocolSettingField>(json);
+
+        Assert.IsNotNull(restored);
+        Assert.AreEqual(field.SelectionGroup, restored.SelectionGroup);
+        Assert.AreEqual("drive:C", restored.Key);
+        Assert.AreEqual(ProtocolSettingKind.Boolean, restored.Kind);
+        Assert.AreEqual("false", restored.DefaultValue);
+        Assert.AreEqual("resources", restored.Page);
+    }
+
+    [TestMethod]
+    public void SelectionGroup_IsOptionalForExistingFieldPayloads()
+    {
+        ProtocolSettingField? field = JsonSerializer.Deserialize<ProtocolSettingField>(
+            """{"Key":"clipboard","Label":"Clipboard","Kind":2,"DefaultValue":"false"}""");
+
+        Assert.IsNotNull(field);
+        Assert.IsNull(field.SelectionGroup);
+        Assert.AreEqual("clipboard", field.Key);
+        Assert.AreEqual("false", field.DefaultValue);
     }
 
     [TestMethod]
