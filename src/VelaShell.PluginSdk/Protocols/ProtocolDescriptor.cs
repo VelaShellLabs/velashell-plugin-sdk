@@ -86,6 +86,15 @@ public sealed record ProtocolSettingChoice(string Value, string Label);
 public sealed record ProtocolSettingPage(string Key, string Label);
 
 /// <summary>
+/// 布尔字段的可折叠选择组,由 <see cref="ProtocolSettingField.SelectionGroup" /> 引用。
+/// 仅为展示元数据,不产生设置键或改变字段的存取方式。
+/// <para>可用版本:TBD(发版时替换)。</para>
+/// </summary>
+/// <param name="Key">组键:稳定标识,序数比较,不随语言变化;空白键不分组。</param>
+/// <param name="Label">组标题(插件自行本地化);同一组以首个字段的标题为准。</param>
+public sealed record ProtocolSettingGroup(string Key, string Label);
+
+/// <summary>
 /// 一个字段的显示条件:另一个字段取到指定值时才显示本字段。
 /// <para>
 /// 为什么需要它:一张平铺的参数表会把**互斥**的参数一起摆出来。Redis 就是活例子 ——
@@ -228,6 +237,20 @@ public sealed record ProtocolSettingField
     /// <para>可用版本:2.1.5。</para>
     /// </summary>
     public string? Page { get; init; }
+
+    /// <summary>
+    /// 可选的可折叠选择组,仅 <see cref="ProtocolSettingKind.Boolean" /> 有效,其余形态忽略。
+    /// <para>
+    /// 同一最终解析分页内,组键按序数比较相等的字段组成一组,以声明顺序中首个字段的组标题为准。
+    /// <see langword="null" /> 或组键为 null、空字符串、纯空白时不分组。
+    /// </para>
+    /// <para>
+    /// 仅影响展示:组本身没有设置键,各字段仍按自身 <see cref="Key" /> 和原值独立存取;
+    /// 折叠不改变选择或清除值。旧宿主忽略此元数据,照常显示独立字段。
+    /// </para>
+    /// <para>可用版本:TBD(发版时替换)。</para>
+    /// </summary>
+    public ProtocolSettingGroup? SelectionGroup { get; init; }
 
     /// <summary>
     /// 显示条件;<see langword="null" /> 表示始终显示。见 <see cref="ProtocolSettingVisibility" />。
