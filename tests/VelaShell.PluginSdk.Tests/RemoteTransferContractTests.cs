@@ -80,9 +80,9 @@ public sealed class RemoteTransferContractTests
     public async Task Fake_ForwardsOptionsIdsAndRequestTokens()
     {
         using var cts = new CancellationTokenSource();
-        var options = new RemoteUploadOptions { OperationId = "start", Overwrite = true, Timeout = TimeSpan.FromHours(10) };
+        var options = new RemoteUploadOptions { OperationId = "start", Overwrite = true, Timeout = TimeSpan.FromHours(10), ApprovalContext = RemoteTransferApprovalContext.ExternalMcp };
         RemoteTransferSnapshot expected = Snapshot();
-        var downloadOptions = new RemoteDownloadOptions { OperationId = "download", Overwrite = true, Timeout = TimeSpan.FromHours(10) };
+        var downloadOptions = new RemoteDownloadOptions { OperationId = "download", Overwrite = true, Timeout = TimeSpan.FromHours(10), ApprovalContext = RemoteTransferApprovalContext.ExternalMcp };
         var fake = new FakeRemoteFs
         {
             SupportsTransferOperations = true,
@@ -272,4 +272,19 @@ public sealed class RemoteTransferContractTests
     }
 
     private static void RoundTrip<T>(T value) => Assert.AreEqual(value, JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(value)));
+
+    [TestMethod]
+    public void TransferApprovalContext_RoundTripsAndLegacyRequestsStillRequireConfirmation()
+    {
+        const string legacy = """{"OperationId":"op","Overwrite":true}""";
+        Assert.AreEqual(RemoteTransferApprovalContext.Default, JsonSerializer.Deserialize<RemoteUploadOptions>(legacy)!.ApprovalContext);
+        Assert.AreEqual(RemoteTransferApprovalContext.Default, JsonSerializer.Deserialize<RemoteDownloadOptions>(legacy)!.ApprovalContext);
+        foreach (RemoteTransferApprovalContext context in new[] { RemoteTransferApprovalContext.ExternalMcp, (RemoteTransferApprovalContext)99 })
+        {
+            RoundTrip(new FsTransferStartUploadRequest("s", "local", "/remote",
+                new() { OperationId = "upload", ApprovalContext = context }));
+            RoundTrip(new FsTransferStartDownloadRequest("s", "/remote", "local",
+                new() { OperationId = "download", ApprovalContext = context }));
+        }
+    }
 }
