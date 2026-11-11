@@ -130,6 +130,18 @@ public enum RemoteTransferState
     TimedOut
 }
 
+/// <summary>
+/// 传输的审批入口提示,不是授权凭据。宿主须独立核对插件身份及用户保存的对应策略;
+/// 缺失或未知值仍逐任务确认。可用版本 TBD(发版时替换)。
+/// </summary>
+public enum RemoteTransferApprovalContext
+{
+    /// <summary>默认逐任务确认。</summary>
+    Default = 0,
+    /// <summary>对外 MCP 入口;仅宿主认可的 AI 插件及用户显式启用的传输方向可自动批准。</summary>
+    ExternalMcp = 1
+}
+
 /// <summary>独立上传选项;无 AI 人为文件大小上限,不携带插件身份或恢复偏移。</summary>
 public sealed record RemoteUploadOptions
 {
@@ -141,6 +153,9 @@ public sealed record RemoteUploadOptions
 
     /// <summary>是否允许原子替换现有目标,默认否;否时必须原子无替换提交,不能仅预先检查存在性或先删除目标。</summary>
     public bool Overwrite { get; init; }
+
+    /// <summary>审批入口提示;不能自行授予免审批权限。可用版本 TBD(发版时替换)。</summary>
+    public RemoteTransferApprovalContext ApprovalContext { get; init; }
 
     /// <summary>
     /// 每执行代次的显式预算;null 无死线,非 null 为正。从该代次登记开始计算,包含排队及收尾;
@@ -157,6 +172,9 @@ public sealed record RemoteDownloadOptions
 
     /// <summary>是否允许原子替换现有本地目标,默认否。</summary>
     public bool Overwrite { get; init; }
+
+    /// <summary>审批入口提示;不能自行授予免审批权限。可用版本 TBD(发版时替换)。</summary>
+    public RemoteTransferApprovalContext ApprovalContext { get; init; }
 
     /// <summary>
     /// 每执行代次的显式预算;null 无死线,非 null 必须为正;从登记开始计算,包含排队、审批、传输及收尾。
