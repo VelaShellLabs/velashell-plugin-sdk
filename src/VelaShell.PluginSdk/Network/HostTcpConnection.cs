@@ -4,7 +4,7 @@ namespace VelaShell.PluginSdk.Network;
 
 /// <summary>
 /// 宿主替插件建立的一条 TCP 连接(<see cref="INetworkApi.ConnectTcpAsync" /> 的结果)。
-/// 释放本对象即关闭连接。可用版本:TBD(发版时替换)。
+/// 释放本对象即关闭连接。可用版本:2.2.0。
 /// </summary>
 /// <param name="stream">已连通的双工字节流;所有权随本对象转移。</param>
 /// <param name="viaProxy">是否经代理建立。</param>

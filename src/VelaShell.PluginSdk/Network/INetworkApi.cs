@@ -20,7 +20,7 @@ namespace VelaShell.PluginSdk.Network;
 /// 跨进程代理一条裸流除了把每个字节多搬一次之外没有别的效果。隔离进程里调用抛
 /// <see cref="NotSupportedException" />。
 /// </para>
-/// <para>可用版本:TBD(发版时替换)。</para>
+/// <para>可用版本:2.2.0。</para>
 /// </summary>
 public interface INetworkApi
 {
@@ -37,11 +37,12 @@ public interface INetworkApi
     /// <returns>已连通的连接。</returns>
     /// <exception cref="ArgumentException">主机为空或端口越界。</exception>
     /// <exception cref="NetworkProxyException">
-    /// 用户显式配置的代理不成立(缺主机端口、凭据超长),或代理拒绝 / 握手失败。
+    /// 选了代理时,凡与代理有关的失败:代理配置不成立(缺主机端口、凭据超长)、连不上代理、
+    /// 代理拒绝、认证失败或握手超时。消息已本地化,指向代理设置。
     /// 宿主**不会**因此静默改为直连。
     /// </exception>
-    /// <exception cref="TimeoutException">在 <see cref="TcpConnectOptions.ConnectTimeout" /> 内未建立。</exception>
-    /// <exception cref="System.Net.Sockets.SocketException">目标(直连时)或代理不可达。</exception>
+    /// <exception cref="TimeoutException">直连时在 <see cref="TcpConnectOptions.ConnectTimeout" /> 内未建立(经代理时超时报 <see cref="NetworkProxyException" />)。</exception>
+    /// <exception cref="System.Net.Sockets.SocketException">直连时目标被拒、不可达或主机名解析不了(操作系统的原始错误)。</exception>
     /// <exception cref="NotSupportedException">宿主实现不支持本能力(隔离进程模式)时。</exception>
     Task<HostTcpConnection> ConnectTcpAsync(
         string host,

@@ -66,7 +66,7 @@ public interface IPluginContext
     /// <summary>
     /// 出站网络能力:按宿主的代理设置(none / system / http / socks5)替插件建立 TCP 连接。
     /// 插件的裸 TCP 出站一律经它,不要自己 <c>new TcpClient()</c>,也不要自己实现代理。
-    /// 仅 <c>inProcess</c> 宿主模式可用,见 <see cref="Network.INetworkApi" />。可用版本:TBD(发版时替换)。
+    /// 仅 <c>inProcess</c> 宿主模式可用,见 <see cref="Network.INetworkApi" />。可用版本:2.2.0。
     /// </summary>
     Network.INetworkApi Network { get; }
 

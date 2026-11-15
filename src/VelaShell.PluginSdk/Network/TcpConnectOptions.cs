@@ -1,6 +1,6 @@
 namespace VelaShell.PluginSdk.Network;
 
-/// <summary><see cref="INetworkApi.ConnectTcpAsync" /> 的选项。可用版本:TBD(发版时替换)。</summary>
+/// <summary><see cref="INetworkApi.ConnectTcpAsync" /> 的选项。可用版本:2.2.0。</summary>
 public sealed record TcpConnectOptions
 {
     /// <summary>建立超时上限(宿主强制夹取)。</summary>
