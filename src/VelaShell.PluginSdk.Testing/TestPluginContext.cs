@@ -2,6 +2,7 @@ using VelaShell.PluginSdk.Clipboard;
 using VelaShell.PluginSdk.Commands;
 using VelaShell.PluginSdk.Events;
 using VelaShell.PluginSdk.Logging;
+using VelaShell.PluginSdk.Network;
 using VelaShell.PluginSdk.Protocols;
 using VelaShell.PluginSdk.RemoteExec;
 using VelaShell.PluginSdk.RemoteFs;
@@ -66,6 +67,9 @@ public sealed class TestPluginContext : IPluginContext, IDisposable
 
     /// <summary>默认远程隧道替身。</summary>
     public FakeRemoteTunnel FakeRemoteTunnel { get; } = new();
+
+    /// <summary>默认出站网络替身。</summary>
+    public FakeNetwork FakeNetwork { get; } = new();
 
     /// <summary>终端视图能力的替身。</summary>
     public FakeTerminalViewApi FakeTerminalView { get; } = new();
@@ -156,6 +160,9 @@ public sealed class TestPluginContext : IPluginContext, IDisposable
     /// <inheritdoc cref="IPluginContext.RemoteTunnel" />
     public IRemoteTunnelApi RemoteTunnel { get; init; }
 
+    /// <inheritdoc cref="IPluginContext.Network" />
+    public INetworkApi Network { get; init; }
+
     /// <inheritdoc cref="IPluginContext.TerminalView" />
     public PluginSdk.TerminalView.ITerminalViewApi TerminalView { get; init; }
 
@@ -199,6 +206,7 @@ public sealed class TestPluginContext : IPluginContext, IDisposable
         RemoteFs = FakeRemoteFs;
         RemoteExec = FakeRemoteExec;
         RemoteTunnel = FakeRemoteTunnel;
+        Network = FakeNetwork;
         TerminalView = FakeTerminalView;
         Commands = RecordingCommands;
         Events = HostEvents;
