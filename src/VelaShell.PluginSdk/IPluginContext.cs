@@ -64,6 +64,13 @@ public interface IPluginContext
     IRemoteTunnelApi RemoteTunnel { get; }
 
     /// <summary>
+    /// 出站网络能力:按宿主的代理设置(none / system / http / socks5)替插件建立 TCP 连接。
+    /// 插件的裸 TCP 出站一律经它,不要自己 <c>new TcpClient()</c>,也不要自己实现代理。
+    /// 仅 <c>inProcess</c> 宿主模式可用,见 <see cref="Network.INetworkApi" />。可用版本:TBD(发版时替换)。
+    /// </summary>
+    Network.INetworkApi Network { get; }
+
+    /// <summary>
     /// 终端视图能力:向插件出借宿主的终端仿真器,拿到一个可嵌进自己界面的终端控件。
     /// 与 <see cref="Terminal" />(旁路宿主已有会话)不同,这里插件拥有一个自己的终端。
     /// 仅 <c>inProcess</c> 宿主模式可用,见 <see cref="TerminalView.ITerminalViewApi" />。
