@@ -7,9 +7,9 @@
 | --- | --- |
 | [`VelaShell.PluginSdk`](https://www.nuget.org/packages/VelaShell.PluginSdk) | 契约程序集:插件入口、`IPluginContext` 与全部能力接口、DTO、`plugin.json` 清单模型、`.vpx` 容器格式、宿主注册表 |
 | [`VelaShell.PluginSdk.Testing`](https://www.nuget.org/packages/VelaShell.PluginSdk.Testing) | 测试替身:`TestPluginContext` 与各能力的内存实现,不起宿主也能测插件 |
-| [`VelaShell.PluginSdk.Build`](https://www.nuget.org/packages/VelaShell.PluginSdk.Build) | 插件工程**只需引用这一个包**:MSBuild targets + 随包分发的打包器(`src/VelaShell.PluginSdk.Packer`,不单独发包)+ 契约程序集 + Avalonia 版本锁 |
+| [`VelaShell.PluginSdk.Build`](https://www.nuget.org/packages/VelaShell.PluginSdk.Build) | 插件构建支持:MSBuild targets + 随包分发的打包器(`src/VelaShell.PluginSdk.Packer`,不单独发包)+ 契约程序集 + 宿主 UI 版本校验 |
 
-> **插件作者只引用 `VelaShell.PluginSdk.Build`**,契约程序集会随它传递进来 ——
+> **插件作者引用 `VelaShell.PluginSdk.Build`**,契约程序集会随它传递进来 ——
 > 见[开发指南](https://github.com/VelaShellLabs/velashell-docs/blob/main/zh/templates/dev-guide.md)。
 
 三个包**同版本、同一次发布**。`.Build` 于 2026-09-11 从 `velashell-plugin-cli` 搬到这里,
@@ -56,21 +56,7 @@ velashell-plugin-templates            dotnet new velaplugin / velaplugin-ui
    代际的插件。纪律是「SDK 主版本 == apiLevel」,由 `scripts/Set-Version.ps1` 在发版前硬核对。
    apiLevel 是契约的属性,CLI 和模板都无权动它。
 
-2. **Avalonia 版本锁的权威** —— 装载器强制让 `Avalonia*` 回落到宿主那一套,插件编译期
-   拿到的 Avalonia 必须与宿主运行时那份同版本,否则跨 ALC 的控件类型对不上,而且要等到
-   用户装上插件才炸。这个版本号写在 `Directory.Build.props` 的 `VelaAvaloniaVersion`,
-   由 `VelaShell.PluginSdk` 包导出成 `$(VelaSdkPinnedAvaloniaVersion)`(`buildTransitive`),
-   两个下游在自己的构建期核对:
-
-   | 谁核对 | 在哪 |
-   | --- | --- |
-   | 宿主 | 宿主仓库 `src/Directory.Build.targets` 的 `VerifyAvaloniaMatchesSdk` |
-   | `VelaShell.PluginSdk.Build` | 本仓库 `src/VelaShell.PluginSdk.Build` 的 `VerifyAvaloniaVersionPin`(同仓库,直接读属性,不绕包) |
-
-   改 `VelaAvaloniaVersion` = 改整个插件生态的 Avalonia 版本,必须与宿主同一波发布,
-   并且在**同一个提交里**把 `.Build` 的两处副本(csproj 上那条精确区间 `[x.y.z]`、
-   `build/VelaShell.PluginSdk.Build.props` 里的同名默认值)一起改掉 —— 否则 `VELA1000` /
-   `VELA1006` 会在构建期红。
+2. **共享 UI 程序集的兼容性** —— Avalonia 由目标宿主选版，不由 SDK 发版。使用 UI 的插件显式引用对应版本；构建时核对实际解析版本，并从插件输出排除共享程序集。配置见 [.Build 说明](src/VelaShell.PluginSdk.Build/README.md)。
 
 ## 在本仓库里开发
 

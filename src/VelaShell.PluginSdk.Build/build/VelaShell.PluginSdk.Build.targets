@@ -59,18 +59,23 @@
     </ItemGroup>
   </Target>
 
-  <!--
-    Avalonia 版本一致性。NuGet 的精确区间已经能挡住绝大多数情况,这里补的是
-    "被别的包传递抬高了版本"这一路 —— 那种情况下 NuGet 只会给一条警告。
-  -->
+  <!-- Compare the resolved compile assets (including transitive references) to the plugin's target host. -->
   <Target Name="VelaCheckAvaloniaVersion" AfterTargets="ResolveAssemblyReferences"
           Condition="'$(VelaSkipAvaloniaVersionCheck)' != 'true'">
     <ItemGroup>
-      <_VelaAvaloniaRef Include="@(ReferencePath)" Condition="'%(ReferencePath.NuGetPackageId)' == 'Avalonia'" />
+      <_VelaUiRef Include="@(ReferencePath)" Condition="'%(ReferencePath.NuGetPackageId)' == 'Avalonia'">
+        <HostProperty>VelaAvaloniaVersion</HostProperty>
+        <HostVersion>$(VelaAvaloniaVersion)</HostVersion>
+      </_VelaUiRef>
+      <_VelaUiRef Include="@(ReferencePath)" Condition="'%(ReferencePath.NuGetPackageId)' == 'Avalonia.AvaloniaEdit'">
+        <HostProperty>VelaAvaloniaEditVersion</HostProperty>
+        <HostVersion>$(VelaAvaloniaEditVersion)</HostVersion>
+      </_VelaUiRef>
     </ItemGroup>
-    <Error Condition="'@(_VelaAvaloniaRef)' != '' and '%(_VelaAvaloniaRef.NuGetPackageVersion)' != '$(VelaAvaloniaVersion)'"
-           Code="VELA1001"
-           Text="This plugin resolves Avalonia %(_VelaAvaloniaRef.NuGetPackageVersion) but the VelaShell host loads $(VelaAvaloniaVersion). The loader forces plugins to share the host's Avalonia assemblies, so a different version fails at runtime (controls will not cast across the load contexts). Pin Avalonia to $(VelaAvaloniaVersion), or set VelaSkipAvaloniaVersionCheck=true if you know what you are doing." />
+    <Error Condition="'@(_VelaUiRef)' != '' and '%(_VelaUiRef.HostVersion)' == ''" Code="VELA1001"
+           Text="This plugin references %(_VelaUiRef.NuGetPackageId). Set %(_VelaUiRef.HostProperty) to the package version used by your target VelaShell host." />
+    <Error Condition="'@(_VelaUiRef)' != '' and '%(_VelaUiRef.NuGetPackageVersion)' != '%(_VelaUiRef.HostVersion)'" Code="VELA1001"
+           Text="This plugin resolves %(_VelaUiRef.NuGetPackageId) %(_VelaUiRef.NuGetPackageVersion), but %(_VelaUiRef.HostProperty) is %(_VelaUiRef.HostVersion). Reference the version used by your target VelaShell host." />
   </Target>
 
   <!--

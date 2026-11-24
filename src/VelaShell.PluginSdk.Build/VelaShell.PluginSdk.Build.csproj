@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>VelaShell.PluginSdk.Build</PackageId>
-    <Description>VelaShell 插件工程的构建支持包:一次引用即得到契约程序集、与宿主版本一致的 Avalonia、共享程序集不落地的处理、清单编译期校验,以及 `dotnet build -t:PackVpx` 一步出 .vpx 包。插件工程只需引用本包。</Description>
+    <Description>VelaShell 插件工程的构建支持包:提供契约程序集、目标宿主的 Avalonia 版本校验、共享程序集不落地的处理、清单编译期校验,以及 `dotnet build -t:PackVpx` 一步出 .vpx 包。UI 插件显式引用目标宿主版本的 Avalonia。</Description>
     <PackageTags>velashell;plugin;msbuild;vpx;sdk</PackageTags>
 
     <!-- 本包不含任何程序集,只有 MSBuild 逻辑与 tools/ 下的打包器。 -->
@@ -27,21 +27,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- 插件作者引用本包即得到这两项,且都以 exclude="Runtime" 的形式传递 ——
-         编译期可见,运行时不复制。原因见 PluginAssemblyLoadContext:
-         VelaShell.PluginSdk 与 Avalonia* 必须与装载方是同一份程序集。 -->
-    <!-- PrivateAssets="none" 不能省:NuGet 默认不让 build/analyzers 资产传递给下游,
-         而 Avalonia 的 **AXAML 编译器就在它的 build 资产里** —— 少了这一条,
-         插件工程里的 .axaml 根本不会被编译,现象是运行时找不到控件而不是构建报错。 -->
-    <!-- Avalonia 的版本写在下面这一行的字面量上,由 NuGet(或合掉 Dependabot 的 PR)
-         直接更新 —— **不要**抽成 MSBuild 属性:Version="$(...)" 会让 Dependabot 与
-         `dotnet add package` 认不出这条依赖,而这个包正是要靠它们来更新的。
-         权威值是本仓库根 Directory.Build.props 的 $(VelaAvaloniaVersion);
-         下面的 VerifyAvaloniaVersionPin 会把两者比一遍(VELA1006)。 -->
-    <PackageReference Include="Avalonia" Version="12.1.6" ExcludeAssets="runtime" PrivateAssets="none">
-      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-
     <!-- 契约 SDK 走 **ProjectReference**(2026-09-11 本包搬进本仓库起)。
          这正是"搬过来"要的效果:.Build 与 VelaShell.PluginSdk 同仓库、同版本、同一次发布,
          于是"本包传给插件工程的那份契约"与"本仓库这一版契约"永远是同一个东西 ——
@@ -71,44 +56,6 @@
   <ItemGroup>
     <None Include="build\**" Pack="true" PackagePath="build\" />
   </ItemGroup>
-
-  <!--
-    Avalonia 版本锁的一致性核对。这个版本号有**三个**落点,任意两处漂了,插件工程编译期
-    拿到的 Avalonia 就与宿主运行时强制共享的那份不是一个版本,表现为跨 ALC 的控件类型
-    对不上,而且要等到用户装上插件才炸。三处是:
-
-      ① $(VelaAvaloniaVersion) —— **权威**,在本仓库根 Directory.Build.props。
-         本包搬进本仓库(2026-09-11)之前,这个值要靠 VelaShell.PluginSdk 包导出的
-         $(VelaSdkPinnedAvaloniaVersion) 跨仓库传过来(旧的 VELA1005 核对的就是它到没到);
-         现在同仓库直接读,少一跳,也少一个会静默失效的环节。
-         宿主那边仍然走包里那份 buildTransitive props 核对同一个值
-         (见宿主 src/Directory.Build.targets 的 VerifyAvaloniaMatchesSdk)。
-      ② 上面 Avalonia 那条 PackageReference 上的精确区间 [x.y.z] —— 本包锁给所有插件
-         工程的就是它。写**字面量**而不是 $(属性):Version="$(...)" 会让 VS 的 NuGet
-         包管理器与 Dependabot 认不出这条依赖,而 Avalonia 正是要靠它们来升的。
-      ③ build/VelaShell.PluginSdk.Build.props 里给插件工程的同名默认值 ——
-         插件工程侧那道 VELA1001 核对拿它做基准。
-
-    下面把三者比一遍。
-  -->
-  <Target Name="VerifyAvaloniaVersionPin" BeforeTargets="Build">
-    <!-- ② 直接从上面那条 PackageReference 上读回来(去掉精确区间的方括号),
-         于是这个版本号在本工程只有 csproj 与 build/*.props 两个落点,没有第三份副本。 -->
-    <PropertyGroup>
-      <_VelaAvaloniaPin>@(PackageReference-&gt;WithMetadataValue('Identity','Avalonia')-&gt;'%(Version)')</_VelaAvaloniaPin>
-      <_VelaAvaloniaPin>$(_VelaAvaloniaPin.Replace('[','').Replace(']',''))</_VelaAvaloniaPin>
-    </PropertyGroup>
-
-    <XmlPeek XmlInputPath="$(MSBuildThisFileDirectory)build\VelaShell.PluginSdk.Build.props" Query="/Project/PropertyGroup/VelaAvaloniaVersion/text()">
-      <Output TaskParameter="Result" ItemName="_VelaShippedAvaloniaVersion" />
-    </XmlPeek>
-
-    <Error Condition="'@(_VelaShippedAvaloniaVersion)' != '$(_VelaAvaloniaPin)'" Code="VELA1000" Text="Avalonia version pin drifted inside this project: the Avalonia PackageReference in VelaShell.PluginSdk.Build.csproj pins '$(_VelaAvaloniaPin)' but build/VelaShell.PluginSdk.Build.props ships '@(_VelaShippedAvaloniaVersion)'. Plugin projects would compile against a different Avalonia than this package pins. Update both to the same version." />
-
-    <Error Condition="'$(VelaAvaloniaVersion)' == ''" Code="VELA1005" Text="VelaAvaloniaVersion is not defined. It is this repository's authoritative pin for the Avalonia version the VelaShell host loads: the root Directory.Build.props declares it, VelaShell.PluginSdk exports it to the host through buildTransitive/VelaShell.PluginSdk.props, and this package locks plugin projects to it. Without the property the check below is silently disabled. Restore it in Directory.Build.props." />
-
-    <Error Condition="'$(VelaAvaloniaVersion)' != '' and '$(VelaAvaloniaVersion)' != '$(_VelaAvaloniaPin)'" Code="VELA1006" Text="Avalonia version pin drifted: this repository pins Avalonia '$(VelaAvaloniaVersion)' in Directory.Build.props (the authoritative value - it is what VelaShell.PluginSdk exports and what the VelaShell host is verified against), but VelaShell.PluginSdk.Build.csproj pins '$(_VelaAvaloniaPin)'. Plugins built with this package would compile against an Avalonia the host does not load. Update the Avalonia PackageReference in VelaShell.PluginSdk.Build.csproj and the VelaAvaloniaVersion in build/VelaShell.PluginSdk.Build.props to '$(VelaAvaloniaVersion)'." />
-  </Target>
 
   <!-- 把打包器收进包的 tools/net11.0/(dotnet exec 需要 dll + runtimeconfig + deps)。
        它的输出目录里还有一份 VelaShell.PluginSdk.dll —— 那是需要的,打包器在插件作者机器上

@@ -8,7 +8,7 @@
     · SDK 带 RequiresPreviewFeatures,插件工程不开预览开关就全线 CA2252
       (于是 VelaShell.PluginSdk.Build.props 里有了 EnablePreviewFeatures 默认值);
     · NuGet 默认不传递 build 资产,Avalonia 的 AXAML 编译器到不了插件工程
-      (于是 .Build 的 PackageReference 上有了 PrivateAssets="none")。
+      (现在 UI 插件直接引用 Avalonia，编译器来自插件自己的 PackageReference)。
   两个坑都只有在"什么都不继承"的前提下才会显形。
 -->
 <Project />

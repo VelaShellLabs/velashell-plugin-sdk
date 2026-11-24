@@ -4,7 +4,7 @@
 #
 #      VelaShell.PluginSdk           契约程序集(插件与宿主唯一共享的类型)
 #      VelaShell.PluginSdk.Testing   测试替身(TestPluginContext 与各能力内存实现)
-#      VelaShell.PluginSdk.Build     插件工程**只需引用的那一个包**(targets + 打包器 + 依赖锁)
+#      VelaShell.PluginSdk.Build     插件构建支持(targets + 打包器 + 宿主 UI 版本校验)
 #
 # .Build 于 2026-09-11 从 velashell-plugin-cli 搬来。它对契约包是 ProjectReference,
 # 因此传给插件工程的那份契约永远就是本仓库这一版 —— 原先"引用哪一版契约"那个跨仓库
@@ -26,11 +26,6 @@
 #
 #    下面的 Stamp 步骤只改 runner 上的工作区,**不回写仓库**:产物版本号因此永远等于
 #    Release 标签,与仓库里当时提交了什么无关。忘了第 ② 步的兜底是 CI 的版本同步体检。
-#
-# ⚠️ Avalonia 版本锁:本仓库是整个插件生态里这个版本号的**权威**。改 VelaAvaloniaVersion
-#    等于改插件生态的 Avalonia 版本 —— 必须与宿主同一波发布,并且**同一个提交里**把
-#    src/VelaShell.PluginSdk.Build 的两处副本(csproj 上那条精确区间、build/*.props 里的
-#    同名默认值)一起改掉,否则构建期的 VELA1000 / VELA1006 会红。
 #
 # 推送用 **NuGet Trusted Publishing(OIDC)**,不存 API Key:
 #   NuGet/login 拿本次运行的 GitHub OIDC 令牌去 nuget.org 换一把**短时效**的推送密钥,
@@ -155,37 +150,6 @@ jobs:
             if ($LASTEXITCODE -ne 0) { exit 1 }
           }
           Get-ChildItem artifacts/nuget | Select-Object -ExpandProperty Name
-
-      # 本仓库是 Avalonia 版本锁的**权威**,而这个事实传给**宿主**的唯一通道就是包里那一个
-      # buildTransitive props 文件(宿主的 VerifyAvaloniaMatchesSdk 读它)。它没打进包也不会
-      # 让 pack 失败,所以拆开核对一遍。
-      # (.Build 现在同仓库,直接读 $(VelaAvaloniaVersion),不走这条通道 —— 见其
-      #  VerifyAvaloniaVersionPin。所以这一步守的是宿主那一侧。)
-      - name: Verify the pin props shipped in the package
-        shell: pwsh
-        run: |
-          $version = '${{ steps.version.outputs.version }}'
-          $nupkg = "artifacts/nuget/VelaShell.PluginSdk.$version.nupkg"
-          if (-not (Test-Path $nupkg)) { throw "Package not found: $nupkg" }
-          $work = Join-Path $env:RUNNER_TEMP 'pinprops'
-          Remove-Item -Recurse -Force $work -ErrorAction SilentlyContinue
-          New-Item -ItemType Directory -Force $work | Out-Null
-          # Expand-Archive 只认 .zip 扩展名,.nupkg 直接喂给它会被拒;先复制一份改名。
-          $zip = Join-Path $work 'pkg.zip'
-          Copy-Item $nupkg $zip
-          Expand-Archive -Path $zip -DestinationPath (Join-Path $work 'x')
-          $props = Join-Path $work 'x/buildTransitive/VelaShell.PluginSdk.props'
-          if (-not (Test-Path $props)) {
-            throw "buildTransitive/VelaShell.PluginSdk.props is missing from the package. The VelaShell host reads the pinned Avalonia version from it; without it the host loses its only consistency check against this SDK."
-          }
-          $text = Get-Content -Raw $props
-          $expected = [regex]::Match((Get-Content -Raw Directory.Build.props), '<VelaAvaloniaVersion>([^<]+)</VelaAvaloniaVersion>').Groups[1].Value
-          $shipped = [regex]::Match($text, '<VelaSdkPinnedAvaloniaVersion>([^<]+)</VelaSdkPinnedAvaloniaVersion>').Groups[1].Value
-          if ($shipped -ne $expected) {
-            throw "Package ships VelaSdkPinnedAvaloniaVersion '$shipped' but Directory.Build.props says '$expected'."
-          }
-          Write-Host "Pinned Avalonia = $shipped, SDK package version = $version"
-          Write-Host $text
 
       # 端到端冒烟:拿刚打出的包,站在插件作者的位置上走一遍
       # (最小插件工程 → 还原 → 构建 → 出 .vpx → 读回容器 → 查共享程序集有没有漏)。

@@ -45,7 +45,7 @@ VelaShell 生态的**全部文档**集中在一个仓库:
 | --- | --- |
 | `VelaShell.PluginSdk` | 契约程序集 —— 插件与宿主**唯一共享的那批类型** |
 | `VelaShell.PluginSdk.Testing` | 测试替身 |
-| `VelaShell.PluginSdk.Build` | 插件工程**只需引用的那一个包**:targets + 随包分发的打包器 + 依赖锁 |
+| `VelaShell.PluginSdk.Build` | 插件构建支持:targets + 随包分发的打包器 + 宿主 UI 版本校验 |
 
 外加一个**不发包**的工程:`src/VelaShell.PluginSdk.Packer`(`IsPackable=false`)——
 `.vpx` 打包器,只以构建产物的形式躺在 `.Build` 包的 `tools/` 下。
@@ -79,11 +79,7 @@ Release 下 `dotnet test` 编不过。签名密钥不入库,CI 从 `STRONG_NAME_
 1. **`apiLevel` 纪律** —— `VelaPluginApi.Level` 是插件兼容性的整数代际,宿主拒载高于自身代际的插件。
    纪律是「SDK 主版本 == apiLevel」,由 `scripts/Set-Version.ps1` 在发版前硬核对。
    **破坏性变更要先手工把 `Level` +1**:脚本会核对但不代改,因为「契约破没破」是人的判断。
-2. **Avalonia 版本锁的权威** —— 值写在 `Directory.Build.props` 的 `VelaAvaloniaVersion`,
-   由 `VelaShell.PluginSdk` 包经 `buildTransitive` 导出成 `$(VelaSdkPinnedAvaloniaVersion)`
-   供宿主核对;`.Build` 现在同仓库,直接读这个属性(`VerifyAvaloniaVersionPin`)。
-   改它 = 改整个插件生态的 Avalonia 版本,必须与宿主同一波发布,并且在**同一个提交里**
-   把 `.Build` 的两处副本(csproj 上那条精确区间、`build/*.props` 里的同名默认值)一起改掉。
+2. **共享 UI 程序集的兼容性** —— 宿主的 `src/Directory.Packages.props` 决定 Avalonia / AvaloniaEdit 版本。使用它们的插件显式声明目标版本与编译依赖；`.Build` 核对实际解析版本，不在 SDK 中新增 UI 依赖或版本常量。宿主升级 Avalonia 不需要发布 SDK。
 
 ### 打包器为什么在本仓库、为什么是独立进程
 
