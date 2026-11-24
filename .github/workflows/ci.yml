@@ -4,7 +4,7 @@
 # 本仓库产出三个包,共用一个版本号:
 #      VelaShell.PluginSdk           契约程序集
 #      VelaShell.PluginSdk.Testing   测试替身
-#      VelaShell.PluginSdk.Build     插件工程只需引用的那一个包
+#      VelaShell.PluginSdk.Build     插件构建支持包
 #                                    (2026-09-11 从 velashell-plugin-cli 搬来)
 #
 # 与 release.yml 的差别只有三处:不推 nuget.org、不上传产物到 Release、
@@ -118,37 +118,6 @@ jobs:
             if ($LASTEXITCODE -ne 0) { exit 1 }
           }
           Get-ChildItem artifacts/nuget | Select-Object -ExpandProperty Name
-
-      # 本仓库是 Avalonia 版本锁的**权威**,而这个事实传给**宿主**的唯一通道就是包里那一个
-      # buildTransitive props 文件(宿主的 VerifyAvaloniaMatchesSdk 读它)。它没打进包也不会
-      # 让 pack 失败,所以拆开核对一遍。
-      # (.Build 现在同仓库,直接读 $(VelaAvaloniaVersion),不走这条通道 —— 见其
-      #  VerifyAvaloniaVersionPin。所以这一步守的是宿主那一侧。)
-      - name: Verify the pin props shipped in the package
-        shell: pwsh
-        run: |
-          $version = '${{ steps.version.outputs.version }}'
-          $nupkg = "artifacts/nuget/VelaShell.PluginSdk.$version.nupkg"
-          if (-not (Test-Path $nupkg)) { throw "Package not found: $nupkg" }
-          $work = Join-Path $env:RUNNER_TEMP 'pinprops'
-          Remove-Item -Recurse -Force $work -ErrorAction SilentlyContinue
-          New-Item -ItemType Directory -Force $work | Out-Null
-          # Expand-Archive 只认 .zip 扩展名,.nupkg 直接喂给它会被拒;先复制一份改名。
-          $zip = Join-Path $work 'pkg.zip'
-          Copy-Item $nupkg $zip
-          Expand-Archive -Path $zip -DestinationPath (Join-Path $work 'x')
-          $props = Join-Path $work 'x/buildTransitive/VelaShell.PluginSdk.props'
-          if (-not (Test-Path $props)) {
-            throw "buildTransitive/VelaShell.PluginSdk.props is missing from the package. The VelaShell host reads the pinned Avalonia version from it; without it the host loses its only consistency check against this SDK."
-          }
-          $text = Get-Content -Raw $props
-          $expected = [regex]::Match((Get-Content -Raw Directory.Build.props), '<VelaAvaloniaVersion>([^<]+)</VelaAvaloniaVersion>').Groups[1].Value
-          $shipped = [regex]::Match($text, '<VelaSdkPinnedAvaloniaVersion>([^<]+)</VelaSdkPinnedAvaloniaVersion>').Groups[1].Value
-          if ($shipped -ne $expected) {
-            throw "Package ships VelaSdkPinnedAvaloniaVersion '$shipped' but Directory.Build.props says '$expected'."
-          }
-          Write-Host "Pinned Avalonia = $shipped, SDK package version = $version"
-          Write-Host $text
 
       # 端到端冒烟:拿刚打出的包,站在插件作者的位置上走一遍
       # (最小插件工程 → 还原 → 构建 → 出 .vpx → 读回容器 → 查共享程序集有没有漏)。

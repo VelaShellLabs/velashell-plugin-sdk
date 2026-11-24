@@ -1,14 +1,23 @@
 # VelaShell.PluginSdk.Build
 
-VelaShell 插件工程唯一需要引用的包。引一个,下面这些全都到位:
+插件引用 `VelaShell.PluginSdk.Build` 即可得到契约与打包工具。升级到不再传递 Avalonia 的 `.Build` 时，原来依赖它编译界面的插件需要显式引用 Avalonia；命令行等不使用 Avalonia 的插件不需要改。
+
+按目标宿主 `src/Directory.Packages.props` 选版本。例如，针对使用 Avalonia 12.2.0 的宿主：
 
 ```xml
-<PackageReference Include="VelaShell.PluginSdk.Build" Version="1.0.0-preview.1" />
+<PropertyGroup>
+  <VelaAvaloniaVersion>12.2.0</VelaAvaloniaVersion>
+</PropertyGroup>
+<ItemGroup>
+  <PackageReference Include="Avalonia" Version="$(VelaAvaloniaVersion)" ExcludeAssets="runtime" />
+</ItemGroup>
 ```
+
+采用集中包管理时，在 `Directory.Packages.props` 的 `PackageVersion` 上设版本，工程引用省略 `Version`。依赖 AvaloniaEdit 时，用 `VelaAvaloniaEditVersion` 单独声明宿主使用的 `Avalonia.AvaloniaEdit` 包版本。使用新版宿主才有的 API 时，将 `plugin.json` 的 `minHostVersion` 设为首个支持它的**宿主版本**，而非 Avalonia 或 SDK 版本。
 
 | 它做了什么 | 为什么 |
 | --- | --- |
-| 传递引入 `VelaShell.PluginSdk`(契约)与 **与宿主版本一致的 Avalonia**,均为编译期引用 | 装载器强制插件与宿主共享这两类程序集;版本不一致会在用户机器上才炸 |
+| 传递引入 `VelaShell.PluginSdk` 契约，不引入 Avalonia | 无 UI 插件无需还原 UI 框架；UI 插件直接引用目标宿主版本，保留 AXAML 编译资产 |
 | `EnableDynamicLoading=true`、`plugin.json` 进输出目录 | 插件是被动态装载的组件,ALC 靠 `deps.json` 解析自带依赖 |
 | 共享程序集的运行时资产不落插件目录 | 放进去也不会被加载,只是撑大包体 |
 | Avalonia 版本冲突从警告升为错误(NU1608/NU1605) | 版本漂移必须在构建期就红,而不是装机后才现形 |

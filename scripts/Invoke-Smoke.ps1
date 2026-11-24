@@ -4,7 +4,7 @@
     端到端冒烟:拿刚打出来的包,站在**插件作者**的位置上走一遍。
 
 .DESCRIPTION
-    验的是 VelaShell.PluginSdk.Build:插件作者**只引这一个包**,它到不到位,这里说了算。
+    验的是 VelaShell.PluginSdk.Build:插件作者直接引用目标宿主的 Avalonia，通过本包得到契约与打包工具。
     (本脚本随该包一起从 velashell-plugin-cli 搬到本仓库,2026-09-11。)
 
     拆库(2026-08-27)之前这一步是"装模板 → dotnet new → 构建 → 出 .vpx"。模板搬去
@@ -111,8 +111,7 @@ if ($text -notmatch 'VELA_BUILD_VERSION') {
 }
 [IO.File]::WriteAllText($csproj, $text.Replace('VELA_BUILD_VERSION', $Version))
 
-# <clear /> 很关键:不清掉的话机器上已有的 nuget.org 缓存或别的源可能把**上一版**
-# 同名包喂进来,冒烟就验不到刚打出的这一版了。nuget.org 仍要留着 —— Avalonia 从那来。
+# CI 的版本号可能已经发布。隔离包缓存并限定来源，确保验的是刚打出的 SDK。
 @"
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
@@ -121,11 +120,18 @@ if ($text -notmatch 'VELA_BUILD_VERSION') {
     <add key="local" value="$feedPath" />
     <add key="nuget" value="https://api.nuget.org/v3/index.json" />
   </packageSources>
+  <packageSourceMapping>
+    <clear />
+    <packageSource key="local"><package pattern="VelaShell.PluginSdk*" /></packageSource>
+    <packageSource key="nuget"><package pattern="*" /></packageSource>
+  </packageSourceMapping>
 </configuration>
 "@ | Set-Content (Join-Path $WorkDirectory 'nuget.config')
 
+$previousPackages = $env:NUGET_PACKAGES
 Push-Location $WorkDirectory
 try {
+    $env:NUGET_PACKAGES = Join-Path (Get-Location) 'obj/packages'
     # ── 1. 构建 + 出包 ──────────────────────────────────────────────────────
     dotnet build -c Release -t:PackVpx --nologo
     if ($LASTEXITCODE -ne 0) { throw "插件工程构建失败(见上方输出)。" }
@@ -149,9 +155,23 @@ try {
         throw "共享程序集漏进了插件输出目录:$($leaked.Name -join ', ')"
     }
 
+    # UI 由目标宿主选版，不是 .Build 的传递依赖；非 UI 插件不该被迫还原 Avalonia。
+    $assets = Get-Content 'obj/project.assets.json' -Raw | ConvertFrom-Json -AsHashtable
+    $graph = @($assets.targets.Values)[0]
+    if ($graph["VelaShell.PluginSdk.Build/$Version"].dependencies.Contains('Avalonia')) {
+        throw '.Build must not select an Avalonia dependency for plugins.'
+    }
+    $exported = dotnet msbuild Smoke.csproj -nologo -getProperty:VelaSdkPackageVersion
+    if ($LASTEXITCODE -ne 0 -or $exported -ne $Version) { throw "Expected SDK version export $Version, got '$exported'." }
+
+    # 不重新还原:保留真实的编译引用，模拟声明了另一版目标宿主的工程。
+    $mismatch = dotnet build --no-restore -c Release -p:VelaAvaloniaVersion=0.0.1 --nologo 2>&1 | Out-String
+    if ($LASTEXITCODE -eq 0 -or $mismatch -notmatch 'VELA1001') { throw "Expected VELA1001 for a host mismatch: $mismatch" }
+
     Write-Host "== 冒烟通过 =="
 }
 finally {
+    $env:NUGET_PACKAGES = $previousPackages
     Pop-Location
 }
 
