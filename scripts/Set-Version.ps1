@@ -18,7 +18,7 @@
     忘了改 VelaPluginApi.SdkVersion:**没有任何东西会报错** —— 只是 `vela-plugin doctor`
     从此汇报一个错的宿主 SDK 版本,插件的 minSdkVersion 门槛跟着判错。这一处最值得自动化。
     docs 那两处不影响功能,但它们是给人照抄的 —— 2026-08-30 全部文档搬到
-    VelaShellLabs/velashell-docs 之后,它们不在本仓库的 checkout 里,所以找不到就跳过。
+    VelaShell/velashell-docs 之后,它们不在本仓库的 checkout 里,所以找不到就跳过。
 
     **不在本仓库的落点**(各自由所在仓库的同名脚本管):
       · dotnet new 模板的 sdkVersion 默认值,以及 velashell-docs 里
@@ -72,7 +72,7 @@ $major = [int]$Matches[1]
 $root = Split-Path -Parent $PSScriptRoot
 
 # ── velashell-docs 的位置 ────────────────────────────────────────────────────
-# 2026-08-30 起全部文档搬到 VelaShellLabs/velashell-docs,版本横幅跟着走了。那是另一个
+# 2026-08-30 起全部文档搬到 VelaShell/velashell-docs,版本横幅跟着走了。那是另一个
 # 仓库,发版 runner 的 checkout 里没有它 —— 所以文档落点是**可选**的:本地开发时两个仓库
 # 通常并排放着,找得到就一起改;找不到就在末尾提醒一句,不让流水线因为缺个兄弟仓库而红。
 if (-not $DocsRoot) {
@@ -175,7 +175,7 @@ if ($skippedDocs.Count -gt 0) {
     Write-Warning @"
 没找到 velashell-docs(试过 $DocsRoot),跳过了这几处文档里的版本横幅:
 $($skippedDocs -join [Environment]::NewLine)
-文档在 https://github.com/VelaShellLabs/velashell-docs —— 把它 clone 到本仓库同级目录,
+文档在 https://github.com/VelaShell/velashell-docs —— 把它 clone 到本仓库同级目录,
 或用 -DocsRoot / `$env:VELASHELL_DOCS 指过去,再跑一次即可一并更新。
 "@
 }

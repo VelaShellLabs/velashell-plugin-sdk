@@ -11,7 +11,7 @@ namespace VelaShell.PluginSdk.Packer;
 /// </summary>
 /// <remarks>
 /// 命令面**刻意只有三条**,而且只服务于一个调用方(那套 targets)——
-/// 面向人的完整工具是 <c>vela-plugin</c>(VelaShellLabs/velashell-plugin-cli),
+/// 面向人的完整工具是 <c>vela-plugin</c>(VelaShell/velashell-plugin-cli),
 /// 它有商店、开发内环、签名与体检。这里多加一条命令,就多一份要与那边对齐的东西。
 ///
 /// 真正的逻辑一行都不在这里:容器格式在 <see cref="VpxContainer" />,清单规则在

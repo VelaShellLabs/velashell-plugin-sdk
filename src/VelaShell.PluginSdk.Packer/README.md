@@ -23,7 +23,7 @@ net11.0。做成 `<UsingTask>` 的话,插件作者在 VS 里一按生成就会�
 版本对齐。
 
 **为什么命令面只有三条。** 面向人的完整工具是
-[`vela-plugin`](https://github.com/VelaShellLabs/velashell-plugin-cli)(商店、开发内环、
+[`vela-plugin`](https://github.com/VelaShell/velashell-plugin-cli)(商店、开发内环、
 签名、体检)。这里只留 targets 真正会调的那两条,外加冒烟用来把包读回来的 `info`。
 多一条命令就多一份要与那边对齐的东西 —— 而两边一致性的根据是它们走同一个 `VpxContainer`,
 不是命令面长得像。

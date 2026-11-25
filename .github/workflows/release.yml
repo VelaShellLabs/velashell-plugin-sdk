@@ -12,8 +12,8 @@
 # (src/VelaShell.PluginSdk.Packer,IsPackable=false,只随 .Build 的 tools/ 分发)。
 #
 # **另外两个包不在这里发**:
-#      VelaShell.Plugin.Cli ……………… VelaShellLabs/velashell-plugin-cli
-#      VelaShell.Plugin.Templates …… VelaShellLabs/velashell-plugin-templates
+#      VelaShell.Plugin.Cli ……………… VelaShell/velashell-plugin-cli
+#      VelaShell.Plugin.Templates …… VelaShell/velashell-plugin-templates
 # 那两个仓库有自己的版本号与自己的 Release 流水线,本仓库发版**不要求**它们跟着发,
 # 本仓库也**不引用**它们的任何东西 —— 依赖方向是单向的,没有环。
 #
@@ -33,7 +33,7 @@
 #   ⚠️ 首次发版前必须在 nuget.org 上为**这三个包**各建一条可信发布策略,三项都填新值:
 #      (VelaShell.PluginSdk.Build 原先那条指向 velashell-plugin-cli,搬库之后**必须重建**,
 #       否则推它的时候会被 nuget.org 拒掉 —— 而那时前两个包已经推上去了。)
-#        Repository owner  VelaShellLabs
+#        Repository owner  VelaShell
 #        Repository        velashell-plugin-sdk
 #        Workflow file     release.yml
 #      建法见 velashell-docs 的 zh/sdk/release-process.md 的「NuGet 可信发布」一节。

@@ -19,7 +19,7 @@
       "打包器与契约同版本"因此是构建出来的事实,不是版本号约定。
 
       **与其余工具链解耦**(2026-08-27 拆库起):vela-plugin 在
-      VelaShellLabs/velashell-plugin-cli,dotnet new 模板在 VelaShellLabs/velashell-plugin-templates,
+      VelaShell/velashell-plugin-cli,dotnet new 模板在 VelaShell/velashell-plugin-templates,
       三者各有各的版本号。SDK 发 1.6.0 不要求 CLI 跟着发;CLI 发 1.5.3 也不代表契约动了。
       本仓库**不引用**那两个仓库的任何东西 —— 依赖方向是单向的,没有环。
 
@@ -41,7 +41,7 @@
   	<Authors>joesdu</Authors>
   	<PackagePrefix>VelaShell</PackagePrefix>
   	<RepositoryType>git</RepositoryType>
-  	<RepositoryUrl>https://github.com/VelaShellLabs/velashell-plugin-sdk</RepositoryUrl>
+    <RepositoryUrl>https://github.com/VelaShell/velashell-plugin-sdk</RepositoryUrl>
   	<GenerateAssemblyConfigurationAttribute>True</GenerateAssemblyConfigurationAttribute>
   	<GenerateAssemblyCompanyAttribute>True</GenerateAssemblyCompanyAttribute>
   	<GenerateAssemblyProductAttribute>True</GenerateAssemblyProductAttribute>
